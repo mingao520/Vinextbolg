@@ -10,7 +10,17 @@
       "Bash(pnpm build:*)",
       "Bash(head:*)",
       "Bash(kill 84960:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.litellm.ai)",
+      "WebFetch(domain:www.volcengine.com)",
+      "WebFetch(domain:segmentfault.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(node:*)",
+      "Bash(AI_BASE_URL=https://test.example.com/v1 AI_API_KEY=test AI_MODEL=test-model node:*)",
+      "Bash(grep error TS:*)",
+      "Bash(AI_BASE_URL=https://test.example.com/v1 AI_API_KEY=test AI_MODEL=test node:*)"
     ]
   }
 }

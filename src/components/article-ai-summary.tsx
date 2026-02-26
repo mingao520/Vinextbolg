@@ -1,0 +1,70 @@
+"use client";
+
+import { useState } from "react";
+import { Sparkles, ChevronDown } from "lucide-react";
+
+interface ArticleAISummaryProps {
+  summary: {
+    summary: string;
+    abstract: string;
+    keyPoints?: string[];
+    tags: string[];
+  };
+}
+
+export function ArticleAISummary({ summary }: ArticleAISummaryProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const hasKeyPoints = summary.keyPoints && summary.keyPoints.length > 0;
+
+  return (
+    <div className="my-4">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-sm font-medium text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+      >
+        <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+        <span>AI 摘要</span>
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="mt-3 rounded-lg border border-zinc-200 bg-white/80 px-6 py-5 backdrop-blur-sm dark:border-zinc-700 dark:bg-zinc-800/60">
+          <p className="text-base leading-[1.9] text-zinc-600 dark:text-zinc-400">
+            {summary.abstract}
+          </p>
+
+          {hasKeyPoints && (
+            <ul className="mt-4 space-y-1.5 border-t border-zinc-100 pt-4 dark:border-zinc-700/60">
+              {summary.keyPoints!.map((point) => (
+                <li
+                  key={point}
+                  className="flex items-start gap-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400/80" />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {summary.tags.length > 0 && (
+            <div className={`flex flex-wrap gap-2 ${hasKeyPoints ? "mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-700/60" : "mt-4 border-t border-zinc-100 pt-4 dark:border-zinc-700/60"}`}>
+              {summary.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block rounded-md bg-zinc-100 px-2.5 py-1 text-xs text-zinc-500 dark:bg-zinc-700/60 dark:text-zinc-400"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

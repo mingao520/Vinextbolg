@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu } from "lucide-react";
@@ -11,6 +12,15 @@ import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  // 文章页：单段路径且非首页/分页/分类
+  const isArticlePage =
+    pathname !== "/" &&
+    !pathname.startsWith("/page/") &&
+    !pathname.startsWith("/category/");
+
+  const showBorder = scrolled || isArticlePage;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -22,8 +32,8 @@ export function SiteHeader() {
   return (
     <header
       className={`fixed left-0 right-0 top-0 z-50 bg-[color:var(--vp-c-bg)]/95 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 ease-out dark:bg-[color:var(--vp-c-bg)]/90 ${
-        scrolled
-          ? "border-b border-zinc-200/80 dark:border-zinc-800/80"
+        showBorder
+          ? "border-b border-zinc-200/80 shadow-sm dark:border-zinc-800/80"
           : "border-b border-transparent"
       }`}
     >

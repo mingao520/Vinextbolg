@@ -62,6 +62,17 @@ export const metadata: Metadata = {
     title: siteConfig.title,
   },
   applicationName: siteConfig.title,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   formatDetection: {
     telephone: false,
   },

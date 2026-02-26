@@ -3,7 +3,7 @@
 import type { PostDetail } from "@/lib/content/types";
 import { getBannerImage } from "@/lib/content/utils";
 import { usePageHits } from "@/hooks/use-article-hits";
-import { IconCalendar, IconEye, IconLoading } from "@/components/icons";
+import { IconCalendar, IconEye, IconLoading, IconClock } from "@/components/icons";
 
 interface ArticleMetaProps {
   post: PostDetail;
@@ -24,17 +24,26 @@ export function ArticleMeta({ post }: ArticleMetaProps) {
             <h1 className="line-clamp-3 max-w-xl break-normal text-xl font-bold leading-10 text-white md:line-clamp-2 md:text-2xl">
               {post.title}
             </h1>
-            <p className="mt-2 flex items-center font-mono text-xs leading-none text-neutral-100 md:text-sm">
-              <IconCalendar className="mr-1 h-3 w-3 text-neutral-100" />
-              <span className="mr-2">{post.date}</span>
-              <IconEye className="mr-1 h-3 w-3 text-neutral-100" />
-              {loading ? (
-                <IconLoading className="-mt-1 mr-2 h-2 w-2 animate-spin text-gray-200 dark:text-slate-600" />
-              ) : (
-                <i className="not-italic">{hits.toLocaleString()}</i>
-              )}
-              <span className="ml-2">{post.readingTime}</span>
-            </p>
+            <div className="mt-3 flex items-center gap-3 text-xs text-neutral-200 md:text-sm">
+              <span className="inline-flex items-center gap-1">
+                <IconCalendar className="h-3.5 w-3.5" />
+                {post.date}
+              </span>
+              <span className="text-neutral-400/60">·</span>
+              <span className="inline-flex items-center gap-1">
+                <IconEye className="h-3.5 w-3.5" />
+                {loading ? (
+                  <IconLoading className="h-2.5 w-2.5 animate-spin text-neutral-300" />
+                ) : (
+                  <>{hits.toLocaleString()} 阅读</>
+                )}
+              </span>
+              <span className="text-neutral-400/60">·</span>
+              <span className="inline-flex items-center gap-1">
+                <IconClock className="h-3.5 w-3.5" />
+                {post.readingTime}
+              </span>
+            </div>
           </div>
         </div>
       </div>

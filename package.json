@@ -19,7 +19,8 @@
     "search:index": "node scripts/generate-search-index.mjs && node scripts/generate-pagefind-index.mjs",
     "search:json": "node scripts/generate-search-index.mjs",
     "search:pagefind": "node scripts/generate-pagefind-index.mjs",
-    "fetch:tweets": "node scripts/fetch-tweets.mjs"
+    "fetch:tweets": "node scripts/fetch-tweets.mjs",
+    "ai:process": "node scripts/ai-process.mjs"
   },
   "dependencies": {
     "@luoleiorg/search-core": "workspace:*",

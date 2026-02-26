@@ -11,6 +11,9 @@ import {
   getPostBySlug,
   getPostSiblings,
 } from "@/lib/content/posts";
+import { ArticleAISummary } from "@/components/article-ai-summary";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { getAISeo, getAISummary } from "@/lib/content/ai-data";
 import { categoryMap, siteConfig } from "@/lib/site-config";
 
 const categoryNameMap = new Map<string, string>(
@@ -45,31 +48,43 @@ export async function generateMetadata({
 
   const articleUrl = `${siteConfig.siteUrl}/${post.slug}`;
   const coverUrl = post.cover ? toAbsoluteUrl(post.cover) : undefined;
+  const aiSeo = getAISeo(slug);
+  const publishedISO = new Date(post.dateTime).toISOString();
+
+  // AI SEO 数据优先，fallback 到原始 excerpt
+  const description = aiSeo?.metaDescription ?? post.excerpt;
+  const ogDescription = aiSeo?.ogDescription ?? post.excerpt;
+  const keywords = aiSeo?.keywords;
+
+  // OG 图片带尺寸信息，提升社交卡片命中率
+  const ogImages = coverUrl
+    ? [{ url: coverUrl, alt: post.title, width: 1200, height: 630 }]
+    : undefined;
 
   return {
     title: post.title,
-    description: post.excerpt,
+    description,
+    ...(keywords ? { keywords } : {}),
     alternates: {
       canonical: articleUrl,
     },
     openGraph: {
       title: post.title,
-      description: post.excerpt,
+      description: ogDescription,
       type: "article",
-      publishedTime: new Date(post.dateTime).toISOString(),
+      publishedTime: publishedISO,
+      modifiedTime: publishedISO,
       url: articleUrl,
       siteName: siteConfig.title,
       locale: "zh_CN",
-      images: coverUrl
-        ? [{ url: coverUrl, alt: post.title }]
-        : undefined,
+      images: ogImages,
     },
     twitter: {
       card: coverUrl ? "summary_large_image" : "summary",
       site: `@${siteConfig.author.twitterUsername}`,
       creator: `@${siteConfig.author.twitterUsername}`,
       title: post.title,
-      description: post.excerpt,
+      description: ogDescription,
       ...(coverUrl ? { images: [coverUrl] } : {}),
     },
   };
@@ -81,6 +96,8 @@ export default async function PostPage({ params }: PostPageProps) {
   if (!post) notFound();
 
   const siblings = getPostSiblings(slug);
+  const aiSummary = getAISummary(slug);
+  const aiSeo = getAISeo(slug);
   const canonicalUrl = `${siteConfig.siteUrl}/${post.slug}`;
   const primaryCategory = post.categories.find(
     (category) => category !== "hot" && categoryNameMap.has(category),
@@ -94,7 +111,7 @@ export default async function PostPage({ params }: PostPageProps) {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
-    description: post.excerpt,
+    description: aiSeo?.metaDescription ?? post.excerpt,
     inLanguage: "zh-CN",
     datePublished: new Date(post.dateTime).toISOString(),
     dateModified: new Date(post.dateTime).toISOString(),
@@ -169,6 +186,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <div className="flex flex-col lg:flex-row lg:gap-12">
         <section className="min-w-0 flex-1 lg:max-w-[860px]">
           <ArticleMeta post={post} />
+          {aiSummary && <ArticleAISummary summary={aiSummary} />}
           <ContentEnhancer />
 
           <article className="article-body article-content mt-6">
@@ -185,6 +203,7 @@ export default async function PostPage({ params }: PostPageProps) {
         </section>
         <ArticleToc headings={post.headings} />
       </div>
+      <ScrollToTop />
     </main>
   );
 }

@@ -174,7 +174,7 @@ function parsePostContent(filePath: string, raw: string): PostItem | null {
     cover: frontmatter.cover,
     categories: frontmatter.categories ?? [],
     excerpt: frontmatter.description ?? extractExcerpt(content),
-    readingTime: `${Math.max(1, Math.round(stats.minutes))} min read`,
+    readingTime: `${Math.max(1, Math.round(stats.minutes))} 分钟阅读`,
   };
 }
 
@@ -300,7 +300,7 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
     cover: frontmatter.cover,
     categories: frontmatter.categories ?? [],
     excerpt: frontmatter.description ?? extractExcerpt(content),
-    readingTime: `${Math.max(1, Math.round(stats.minutes))} min read`,
+    readingTime: `${Math.max(1, Math.round(stats.minutes))} 分钟阅读`,
     headings,
     html,
   };
