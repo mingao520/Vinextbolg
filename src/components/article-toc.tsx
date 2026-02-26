@@ -20,12 +20,17 @@ export function ArticleToc({ headings }: ArticleTocProps) {
   );
   const [activeId, setActiveId] = useState(tocHeadings[0]?.id ?? "");
   const markerRef = useRef<HTMLSpanElement | null>(null);
+  const isClickScrolling = useRef(false);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!tocHeadings.length) return;
 
     const updateActiveHeading = () => {
-      const offset = 120;
+      // 如果是点击导致的滚动，跳过检测
+      if (isClickScrolling.current) return;
+
+      const offset = 110; // 与 CSS scroll-margin-top 保持一致
       let currentId = tocHeadings[0]?.id ?? "";
 
       for (const heading of tocHeadings) {
@@ -43,6 +48,9 @@ export function ArticleToc({ headings }: ArticleTocProps) {
     window.addEventListener("scroll", updateActiveHeading, { passive: true });
     return () => {
       window.removeEventListener("scroll", updateActiveHeading);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
     };
   }, [tocHeadings]);
 
@@ -65,13 +73,29 @@ export function ArticleToc({ headings }: ArticleTocProps) {
     marker.style.transform = `translateY(${Math.max(0, top)}px)`;
   }, [activeId, tocHeadings]);
 
+  const handleClick = (id: string) => {
+    // 设置点击标志，暂时禁用 scroll 检测
+    isClickScrolling.current = true;
+    setActiveId(id);
+
+    // 清除之前的定时器
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+
+    // 1 秒后恢复 scroll 检测
+    clickTimeoutRef.current = setTimeout(() => {
+      isClickScrolling.current = false;
+    }, 1000);
+  };
+
   if (!tocHeadings.length) {
     return null;
   }
 
   return (
     <div className="hidden lg:block lg:w-[220px] lg:flex-shrink-0">
-      <div className="fixed top-[110px] w-[220px] max-h-[calc(100vh-140px)] overflow-y-auto">
+      <div className="fixed top-[110px] w-[220px] max-h-[calc(100vh-140px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 dark:hover:scrollbar-thumb-gray-500">
         <div className="article-toc">
           <span
             aria-hidden="true"
@@ -88,7 +112,7 @@ export function ArticleToc({ headings }: ArticleTocProps) {
                   className={`article-toc-link ${
                     heading.level === 3 ? "pl-3" : ""
                   } ${activeId === heading.id ? "is-active" : ""}`}
-                  onClick={() => setActiveId(heading.id)}
+                  onClick={() => handleClick(heading.id)}
                 >
                   {heading.text}
                 </a>

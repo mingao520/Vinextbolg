@@ -1,4 +1,5 @@
 import { IconCopyright, IconMarkdown } from "@/components/icons";
+import { siteConfig } from "@/lib/site-config";
 
 interface ArticleCopyrightProps {
   title: string;
@@ -7,8 +8,8 @@ interface ArticleCopyrightProps {
 }
 
 export function ArticleCopyright({ title, date, slug }: ArticleCopyrightProps) {
-  const articleLink = `https://luolei.org/${slug}`;
-  const markdownLink = `https://github.com/foru17/luoleiorg-x/tree/main/content/posts/${slug}.md`;
+  const articleLink = `${siteConfig.siteUrl}/${slug}`;
+  const markdownLink = `https://github.com/${siteConfig.contentRepo.owner}/${siteConfig.contentRepo.repo}/tree/${siteConfig.contentRepo.branch}/${siteConfig.contentRepo.contentPath}/${slug}.md`;
 
   return (
     <div className="w-auto">
@@ -22,12 +23,12 @@ export function ArticleCopyright({ title, date, slug }: ArticleCopyrightProps) {
             <span className="mr-1 font-medium">作者:</span>
             <span>
               <a
-                href="https://luolei.org"
+                href={siteConfig.siteUrl}
                 className="text-blue-600 hover:text-blue-500 dark:text-blue-300"
                 rel="noreferrer"
                 target="_blank"
               >
-                罗磊
+                {siteConfig.author.name}
               </a>
             </span>
           </div>

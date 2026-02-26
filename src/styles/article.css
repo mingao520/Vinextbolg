@@ -65,21 +65,67 @@
   font-family: var(--vp-font-family-mono);
 }
 
+/* 文章内链接样式 - 外链增强版 */
 .article-content a {
   position: relative;
+  display: inline-flex;
   align-items: center;
-  vertical-align: bottom;
-  font-weight: 400;
+  gap: 4px;
+  vertical-align: baseline;
+  font-weight: 500;
   color: var(--vp-c-brand);
   text-decoration: none;
   text-overflow: ellipsis;
+  padding: 0 2px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
 }
 
+/* 悬停效果 - 背景高亮 + 下划线动画 */
 .article-content a:hover {
+  color: var(--vp-c-brand);
+  background-color: var(--vp-c-brand-soft);
   text-decoration: none;
-  opacity: 0.8;
-  text-decoration: underline;
 }
+
+/* 外链标识 - 添加外部链接图标 */
+.article-content a[href^="http"]::after {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 2px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234f46e5' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.article-content a[href^="http"]:hover::after {
+  opacity: 1;
+  transform: translate(1px, -1px);
+}
+
+/* 暗色模式下的外链图标 */
+.dark .article-content a[href^="http"]::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23818cf8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'/%3E%3C/svg%3E");
+}
+
+/* 点击反馈效果 */
+.article-content a:active {
+  transform: scale(0.98);
+}
+
+/* 带 favicon 的链接样式 */
+.article-content a.has-favicon {
+  padding-left: 2px;
+}
+
+.article-content a.has-favicon::after {
+  display: none;
+}
+
 
 .article-content :not(pre) > code {
   margin: 0 2px;
@@ -114,33 +160,46 @@
   line-height: 28px;
 }
 
+/* Favicon 样式优化 */
 .article-content a .favicon {
   display: inline-block;
-  border-radius: 0;
-  transition: border-radius 0.3s ease-in-out;
-}
-
-.article-content a.pending-favicon .favicon {
-  width: 10px;
-  height: 10px;
-  margin-left: 2px;
-  margin-right: 6px;
-  margin-top: -4px;
-  border-radius: 0;
-  animation: spin 1s ease-in-out infinite;
-}
-
-.article-content a:hover .favicon {
-  border-radius: 100%;
-}
-
-.article-content a.has-favicon .favicon,
-.article-content a.err-favicon .favicon {
   width: 14px;
   height: 14px;
-  margin-left: 2px;
-  margin-right: 2px;
-  margin-top: -4px;
+  margin-right: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+  opacity: 0.8;
+}
+
+/* 加载中的 favicon */
+.article-content a.pending-favicon .favicon {
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--vp-c-brand) 25%, transparent 25%);
+  animation: spin 0.8s linear infinite;
+  opacity: 0.5;
+}
+
+/* 悬停时 favicon 效果 */
+.article-content a:hover .favicon {
+  transform: scale(1.1);
+  opacity: 1;
+  border-radius: 3px;
+}
+
+/* 已加载的 favicon */
+.article-content a.has-favicon .favicon {
+  opacity: 0.85;
+}
+
+/* 加载失败的 favicon */
+.article-content a.err-favicon .favicon {
+  opacity: 0.3;
+  filter: grayscale(100%);
 }
 
 .article-content summary {
@@ -248,4 +307,152 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+/* H1 - 文章标题通常不用，但以防万一 */
+.article-content h1 {
+  margin: 32px 0 16px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* H4, H5, H6 */
+.article-content h4 {
+  margin: 16px 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.article-content h5 {
+  margin: 14px 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.article-content h6 {
+  margin: 12px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+}
+
+/* Table 样式 */
+.article-content table {
+  width: 100%;
+  margin: 24px 0;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.article-content th,
+.article-content td {
+  padding: 12px 16px;
+  border: 1px solid var(--vp-c-divider);
+  text-align: left;
+}
+
+.article-content th {
+  background-color: var(--vp-c-bg-alt);
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.article-content tr:nth-child(even) {
+  background-color: var(--vp-c-bg-soft);
+}
+
+.article-content tr:hover {
+  background-color: var(--vp-c-bg-alt);
+}
+
+/* 列表样式优化 */
+.article-content ul li {
+  list-style-type: disc;
+}
+
+.article-content ol li {
+  list-style-type: decimal;
+}
+
+.article-content li {
+  margin: 8px 0;
+  line-height: 1.8;
+}
+
+.article-content li > ul,
+.article-content li > ol {
+  margin: 8px 0 8px 20px;
+}
+
+/* Blockquote */
+.article-content blockquote {
+  margin: 24px 0;
+  padding: 12px 20px;
+  border-left: 4px solid var(--vp-c-brand);
+  background-color: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-style: italic;
+}
+
+.article-content blockquote p {
+  margin: 8px 0;
+}
+
+/* Horizontal Rule */
+.article-content hr {
+  margin: 32px 0;
+  border: none;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+/* 响应式表格 */
+@media (max-width: 768px) {
+  .article-content table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .article-content th,
+  .article-content td {
+    padding: 8px 12px;
+  }
+}
+
+/* Desktop 优化 */
+@media (min-width: 960px) {
+  .article-content h1 {
+    font-size: 32px;
+  }
+  
+  .article-content h2 {
+    font-size: 26px;
+  }
+  
+  .article-content h3 {
+    font-size: 20px;
+  }
+  
+  .article-content h4 {
+    font-size: 18px;
+  }
+  
+  .article-content table {
+    font-size: 15px;
+  }
+}
+
+/* Favicon 容器 */
+.article-content a .favicon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  vertical-align: middle;
 }

@@ -1,50 +1,54 @@
 import { NextResponse } from "next/server";
-import { EXTERNAL_API_PAGE_HITS } from "@/lib/analytics";
+import { fetchGA4PageViews, isGA4Configured } from "@/lib/ga4";
 
 export const runtime = "edge";
 
-// Cache for 5 minutes at the edge
-export const revalidate = 300;
+export const revalidate = 21600; // 6 小时
 
-interface CfRequestInit extends RequestInit {
-  cf?: {
-    cacheTtl?: number;
-    cacheEverything?: boolean;
-  };
-}
+let cache: { data: { total: number; data: Array<{ page: string; hit: number }> }; timestamp: number } | null = null;
+const CACHE_TTL = 6 * 60 * 60 * 1000;
 
 export async function GET() {
   try {
-    const response = await fetch(EXTERNAL_API_PAGE_HITS, {
-      cf: {
-        // Cache in Cloudflare's edge for 5 minutes
-        cacheTtl: 300,
-        cacheEverything: true,
-      },
-    } as CfRequestInit);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status}`);
+    if (cache && Date.now() - cache.timestamp < CACHE_TTL) {
+      console.log("[Analytics] Using cached data");
+      return NextResponse.json(cache.data, {
+        headers: {
+          "Cache-Control": "public, max-age=21600",
+          "X-Cache": "HIT",
+        },
+      });
     }
 
-    const data = await response.json();
+    if (!isGA4Configured()) {
+      console.warn("[Analytics] GA4 not configured");
+      return NextResponse.json(
+        { total: 0, data: [] },
+        { headers: { "Cache-Control": "public, max-age=3600", "X-Cache": "MISS" } }
+      );
+    }
+
+    console.log("[Analytics] Fetching from GA4...");
+    const results = await fetchGA4PageViews();
+    const data = { total: results.length, data: results };
+    cache = { data, timestamp: Date.now() };
 
     return NextResponse.json(data, {
       headers: {
-        // Cache in browser for 2 minutes
-        "Cache-Control": "public, max-age=120, stale-while-revalidate=300",
+        "Cache-Control": "public, max-age=21600",
+        "X-Cache": "MISS",
       },
     });
   } catch (error) {
-    console.error("Failed to fetch analytics:", error);
-    // Return empty data on error
+    console.error("[Analytics] Error:", error);
+    if (cache) {
+      return NextResponse.json(cache.data, {
+        headers: { "Cache-Control": "public, max-age=3600", "X-Cache": "STALE" },
+      });
+    }
     return NextResponse.json(
-      { data: [] },
-      {
-        headers: {
-          "Cache-Control": "public, max-age=60",
-        },
-      }
+      { total: 0, data: [] },
+      { headers: { "Cache-Control": "public, max-age=3600" } }
     );
   }
 }

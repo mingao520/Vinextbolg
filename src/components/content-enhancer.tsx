@@ -35,8 +35,10 @@ export function ContentEnhancer() {
       margin: 24,
     });
 
+    // 处理文章内链接
     const links =
       document.querySelectorAll<HTMLAnchorElement>(".article-body a");
+    
     links.forEach((link) => {
       const href = link.getAttribute("href");
       if (
@@ -50,11 +52,17 @@ export function ContentEnhancer() {
       const domain = href.split("/")[2];
       if (!domain) return;
 
+      // 创建 favicon 容器
+      const faviconWrapper = document.createElement("span");
+      faviconWrapper.className = "favicon-wrapper";
+      
       link.classList.add("pending-favicon");
+      
       const img = document.createElement("img");
       img.className = "favicon";
       img.src = getFaviconUrl(domain);
       img.alt = "";
+      img.loading = "lazy";
 
       img.onload = () => {
         link.classList.remove("pending-favicon");
@@ -64,9 +72,12 @@ export function ContentEnhancer() {
       img.onerror = () => {
         link.classList.remove("pending-favicon");
         link.classList.add("err-favicon");
+        // 失败后移除 favicon
+        faviconWrapper.remove();
       };
 
-      link.prepend(img);
+      faviconWrapper.appendChild(img);
+      link.prepend(faviconWrapper);
     });
 
     // Hydrate TweetCards

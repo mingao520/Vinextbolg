@@ -1,4 +1,4 @@
-import { EXTERNAL_API_PAGE_HITS, type PageHitItem } from "@/lib/analytics";
+import { fetchGA4PageViews, isGA4Configured } from "@/lib/ga4";
 import { articlePageSize, categoryMap } from "@/lib/site-config";
 import { getAllPosts } from "./posts";
 import type { PostItem } from "./types";
@@ -7,7 +7,7 @@ const categoryNameMap = new Map<string, string>(
   categoryMap.map((item) => [item.text, item.name]),
 );
 
-// In-memory cache for hits data
+// 服务端缓存（6小时，因为 GA4 数据有 24-48 小时延迟）
 interface HitsCache {
   data: Map<string, number>;
   timestamp: number;
@@ -15,7 +15,7 @@ interface HitsCache {
 }
 
 let hitsCache: HitsCache | null = null;
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6小时
 
 export interface PostListingResult {
   category?: string;
@@ -37,18 +37,9 @@ function parsePageNumber(pageParam?: string): number {
   return integer > 0 ? integer : 1;
 }
 
-/**
- * Extract slug from page path/URL
- * Handles formats:
- * - "/article-slug" → "article-slug"
- * - "https://luolei.org/article-slug/" → "article-slug"
- * - "https://x.luolei.org/article-slug" → "article-slug"
- */
 function extractSlug(page: string): string {
-  // Remove protocol and domain if present
   let path = page;
   
-  // Handle full URLs like "https://luolei.org/article-slug/"
   if (path.includes("://")) {
     try {
       const url = new URL(path);
@@ -58,7 +49,6 @@ function extractSlug(page: string): string {
     }
   }
   
-  // Remove leading and trailing slashes
   return path.replace(/^\//, "").replace(/\/$/, "");
 }
 
@@ -66,37 +56,39 @@ async function getHitsMap(): Promise<{
   hitsMap: Map<string, number>;
   hitsLoading: boolean;
 }> {
-  // Check if cache is valid
+  // 检查缓存
   if (hitsCache && Date.now() - hitsCache.timestamp < CACHE_TTL_MS) {
+    console.log("[Server] Using cached hits data");
     return { hitsMap: hitsCache.data, hitsLoading: hitsCache.loading };
   }
 
-  // Return stale cache immediately to avoid blocking, then refresh in background
   const staleCache = hitsCache;
 
-  // Start fresh fetch
+  // 启动获取
   const fetchPromise = (async () => {
     const hitsMap = new Map<string, number>();
     let loading = true;
 
     try {
-      const hitsRes = await fetch(EXTERNAL_API_PAGE_HITS, {
-        cache: "no-store",
-        signal: AbortSignal.timeout(3000), // 3 second timeout
-      });
-      const hitsJson = (await hitsRes.json()) as { data?: PageHitItem[] };
-      for (const item of hitsJson.data ?? []) {
-        const slug = extractSlug(item.page);
-        // Accumulate hits for the same slug (handles /slug, /slug/, /slug/amp/ etc.)
-        const existingHit = hitsMap.get(slug) ?? 0;
-        hitsMap.set(slug, existingHit + item.hit);
+      if (!isGA4Configured()) {
+        console.warn("[Server] GA4 not configured");
+        loading = false;
+      } else {
+        console.log("[Server] Fetching hits from GA4...");
+        const results = await fetchGA4PageViews();
+        
+        for (const item of results) {
+          const slug = extractSlug(item.page);
+          const existingHit = hitsMap.get(slug) ?? 0;
+          hitsMap.set(slug, existingHit + item.hit);
+        }
+        loading = false;
+        console.log("[Server] Hits loaded:", hitsMap.size, "unique slugs");
       }
-      loading = false;
-    } catch {
-      // Keep loading = true on error
+    } catch (error) {
+      console.error("[Server] Failed to fetch hits:", error);
     }
 
-    // Update cache
     hitsCache = {
       data: hitsMap,
       timestamp: Date.now(),
@@ -106,14 +98,11 @@ async function getHitsMap(): Promise<{
     return { hitsMap, hitsLoading: loading };
   })();
 
-  // If we have stale cache, return it immediately and refresh in background
   if (staleCache) {
-    // Trigger background refresh
     fetchPromise.catch(() => {});
     return { hitsMap: staleCache.data, hitsLoading: staleCache.loading };
   }
 
-  // First request, wait for data
   return fetchPromise;
 }
 
@@ -133,7 +122,6 @@ export async function getPostListing(params: {
   const requestedPage = parsePageNumber(params.pageParam);
   const allPosts = getAllPosts();
   
-  // Start fetching hits in parallel with filtering
   const hitsPromise = getHitsMap();
   
   const posts =
@@ -141,10 +129,8 @@ export async function getPostListing(params: {
       ? allPosts.filter((post) => post.categories.includes(category))
       : allPosts;
 
-  // Wait for hits data
   const { hitsMap, hitsLoading } = await hitsPromise;
 
-  // Sort posts by hits for hot category
   const sortedPosts =
     category === "hot"
       ? [...posts].sort(

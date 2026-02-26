@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { siteConfig } from "@/lib/site-config";
 
 declare global {
   interface Window {
@@ -66,12 +67,12 @@ export function ArticleComment({ slug, title }: ArticleCommentProps) {
       if (!window.Artalk || !containerRef.current) return;
       window.Artalk.init({
         el: containerRef.current,
-        pageKey: `https://luolei.org/${slug}/`,
+        pageKey: `${siteConfig.siteUrl}/${slug}/`,
         pageTitle: title,
-        server: "https://artalk.is26.com",
-        site: "罗磊的独立博客",
+        server: siteConfig.comments.server,
+        site: siteConfig.comments.siteName,
         gravatar: {
-          mirror: "https://cravatar.cn/avatar/",
+          mirror: siteConfig.comments.gravatarMirror,
         },
       });
     };

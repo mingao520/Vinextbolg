@@ -22,8 +22,8 @@ const CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes for client-side cache
  * Extract slug from page path/URL
  * Handles formats:
  * - "/article-slug" → "article-slug"
- * - "https://luolei.org/article-slug/" → "article-slug"
- * - "https://x.luolei.org/article-slug" → "article-slug"
+ * - "https://example.com/article-slug/" → "article-slug"
+ * - "https://example.com/article-slug" → "article-slug"
  */
 function extractSlug(page: string): string {
   // Remove protocol and domain if present
