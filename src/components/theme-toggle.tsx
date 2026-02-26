@@ -24,7 +24,7 @@ export function ThemeToggle() {
       onClick={() => setIsDark((value) => !value)}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={isDark}
-      className="group relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent bg-transparent text-zinc-600 transition-all hover:scale-105 hover:bg-zinc-100 sm:border-zinc-200 sm:bg-zinc-50/70 dark:border-transparent dark:bg-transparent dark:text-zinc-300 dark:hover:bg-zinc-800 sm:dark:border-zinc-700/50 sm:dark:bg-zinc-900/70"
+      className="group relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-transparent bg-transparent text-zinc-600 transition-all hover:scale-105 hover:bg-zinc-100 dark:border-transparent dark:bg-transparent dark:text-zinc-300 dark:hover:bg-zinc-800"
     >
       <Sun
         className={`h-4 w-4 transition-all duration-200 ${

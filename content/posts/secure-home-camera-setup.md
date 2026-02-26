@@ -268,11 +268,11 @@ rest_command:
     verify_ssl: true
 
   camera_on:
-    url: http://10.0.0.5:5000/webapi/SurveillanceStation/Webhook/Incoming/v1?token=iQRJyuOYPIZODrWMRfT
+    url: http://10.0.0.5:5000/webapi/SurveillanceStation/Webhook/Incoming/v1?token=YOUR_TOKEN_HERE
     method: GET
 
   camera_off:
-    url: http://10.0.0.5:5000/webapi/SurveillanceStation/Webhook/Incoming/v1?token=iVufyERsmJZEM1UJ7M
+    url: http://10.0.0.5:5000/webapi/SurveillanceStation/Webhook/Incoming/v1?token=YOUR_TOKEN_HERE
     method: GET
 ```
 

@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { siteConfig } from "@/lib/site-config";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { ThemeColorMeta } from "@/components/theme-color-meta";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -31,10 +32,33 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/legacy/favicon.ico" },
-      { url: "/legacy/favicon.png", type: "image/png" },
+      { url: "/legacy/favicon.ico", sizes: "32x32" },
+      { url: "/legacy/favicon.png", type: "image/png", sizes: "256x256" },
+    ],
+    apple: [
+      { url: "/legacy/favicon.png", sizes: "180x180", type: "image/png" },
     ],
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.title,
+  },
+  applicationName: siteConfig.title,
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#18181b" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({
@@ -44,6 +68,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="scroll-pt-[60px]">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <ThemeColorMeta />
+      </head>
       <body className="antialiased pt-[52px]">
         <SiteHeader />
         {children}

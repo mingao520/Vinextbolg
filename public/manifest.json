@@ -1,0 +1,16 @@
+{
+  "name": "罗磊的独立博客",
+  "short_name": "罗磊博客",
+  "description": "罗磊的独立博客 - 分享技术、生活与思考",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/legacy/favicon.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}
