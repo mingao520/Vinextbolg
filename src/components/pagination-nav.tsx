@@ -19,7 +19,8 @@ function makeLink(page: number, category?: string) {
     return "/";
   }
 
-  return `/?page=${page}`;
+  // SEO 友好格式：/page/2, /page/3
+  return `/page/${page}`;
 }
 
 export function PaginationNav({
@@ -34,6 +35,7 @@ export function PaginationNav({
     <div className="mt-8 flex items-center justify-center">
       {hasPrev ? (
         <Link
+          prefetch={true}
           className="inline-flex h-8 w-24 items-center justify-center whitespace-nowrap rounded bg-white px-2 text-sm font-medium uppercase leading-normal text-neutral-500 shadow-md transition duration-150 ease-in-out hover:bg-neutral-100 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           href={makeLink(page - 1, category)}
         >
@@ -55,6 +57,7 @@ export function PaginationNav({
       </p>
       {hasNext ? (
         <Link
+          prefetch={true}
           className="inline-flex h-8 w-24 items-center justify-center whitespace-nowrap rounded bg-white px-4 text-sm font-medium uppercase leading-normal text-neutral-500 shadow-md transition duration-150 ease-in-out hover:bg-neutral-100 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           href={makeLink(page + 1, category)}
         >

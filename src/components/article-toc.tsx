@@ -70,9 +70,9 @@ export function ArticleToc({ headings }: ArticleTocProps) {
   }
 
   return (
-    <aside className="hidden lg:block lg:self-stretch">
-      <div className="article-toc-shell sticky top-[110px] max-h-[calc(100vh-120px)]">
-        <div className="article-toc h-full overflow-y-auto">
+    <div className="hidden lg:block lg:w-[220px] lg:flex-shrink-0">
+      <div className="fixed top-[110px] w-[220px] max-h-[calc(100vh-140px)] overflow-y-auto">
+        <div className="article-toc">
           <span
             aria-hidden="true"
             ref={markerRef}
@@ -97,6 +97,6 @@ export function ArticleToc({ headings }: ArticleTocProps) {
           </ul>
         </div>
       </div>
-    </aside>
+    </div>
   );
 }

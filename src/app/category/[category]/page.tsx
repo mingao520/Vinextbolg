@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleList } from "@/components/article-list";
 import { CategoryNav } from "@/components/category-nav";
 import { PaginationNav } from "@/components/pagination-nav";
@@ -79,15 +79,15 @@ export default async function CategoryPage({
   }
 
   if (category !== normalizedCategory) {
-    redirect(categoryUrl(normalizedCategory));
+    permanentRedirect(categoryUrl(normalizedCategory));
   }
 
   if (query.page && queryPage <= 1) {
-    redirect(categoryUrl(normalizedCategory));
+    permanentRedirect(categoryUrl(normalizedCategory));
   }
 
   if (queryPage > 1) {
-    redirect(`${categoryUrl(normalizedCategory)}/page/${queryPage}`);
+    permanentRedirect(`${categoryUrl(normalizedCategory)}/page/${queryPage}`);
   }
 
   const listing = await getPostListing({ category: normalizedCategory });

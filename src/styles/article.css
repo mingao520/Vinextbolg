@@ -155,7 +155,6 @@
 .article-content h3[id] {
   scroll-margin-top: 110px;
 }
-
 .article-toc {
   position: relative;
   border-left: 1px solid var(--vp-c-mute);

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleList } from "@/components/article-list";
 import { CategoryNav } from "@/components/category-nav";
 import { PaginationNav } from "@/components/pagination-nav";
@@ -76,11 +76,11 @@ export default async function CategoryPagedPage({ params }: CategoryPagedPagePro
   }
 
   if (category !== normalizedCategory) {
-    redirect(categoryPageUrl(normalizedCategory, parsedPage));
+    permanentRedirect(categoryPageUrl(normalizedCategory, parsedPage));
   }
 
   if (parsedPage <= 1) {
-    redirect(categoryPageUrl(normalizedCategory, 1));
+    permanentRedirect(categoryPageUrl(normalizedCategory, 1));
   }
 
   const listing = await getPostListing({

@@ -13,6 +13,7 @@ export function CategoryNav({ currentCategory }: CategoryNavProps) {
           <div className="m-auto flex items-center text-black dark:text-slate-300">
             <Link
               href="/"
+              prefetch={true}
               className={`home-nav-title relative ml-0 mr-0 rounded-xl px-3 py-1 text-center text-sm hover:text-rose-400 md:ml-1 md:mr-2 md:text-base ${
                 currentCategory
                   ? "!text-black dark:!text-slate-300"
@@ -33,6 +34,7 @@ export function CategoryNav({ currentCategory }: CategoryNavProps) {
                   <Link
                     key={category.text}
                     href={`/category/${encodeURIComponent(category.text)}`}
+                    prefetch={true}
                     className={`home-nav-title ml-0 mr-0 inline-block rounded-xl px-3 py-1 text-center text-sm hover:text-rose-400 md:ml-1 md:mr-2 md:px-3 md:text-base ${
                       active
                         ? "!text-rose-400 !font-semibold dark:!text-rose-400"

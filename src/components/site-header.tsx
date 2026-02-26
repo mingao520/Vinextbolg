@@ -8,7 +8,7 @@ import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-30 border-b border-zinc-200 bg-[color:var(--vp-c-bg)]/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-[color:var(--vp-c-bg)]/90">
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-[color:var(--vp-c-bg)]/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-[color:var(--vp-c-bg)]/90">
       <div className="mx-auto flex h-[52px] w-full max-w-[1280px] items-center justify-between px-4 md:px-8">
         <Link
           href="/"

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   IconCalendar,
@@ -30,59 +29,24 @@ export function ArticleCard({
   const imageUrl = getPreviewImage(post.cover);
   const isVideo = post.categories.includes("zuoluotv");
   const isHot = hits > hotArticleViews;
-  const [imageLoaded, setImageLoaded] = useState(() => !imageUrl);
-  const [imageError, setImageError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!imageUrl) {
-      setImageLoaded(true);
-      setImageError(true);
+      setHasError(true);
       return;
     }
 
-    setImageLoaded(false);
-    setImageError(false);
-
-    let active = true;
-    const preloader = new window.Image();
-
-    const markLoaded = () => {
-      if (!active) return;
-      setImageError(false);
-      setImageLoaded(true);
-    };
-
-    const markError = () => {
-      if (!active) return;
-      setImageError(true);
-      setImageLoaded(true);
-    };
-
-    preloader.onload = markLoaded;
-    preloader.onerror = markError;
-    preloader.src = imageUrl;
-
-    if (preloader.complete) {
-      if (preloader.naturalWidth > 0) {
-        markLoaded();
-      } else {
-        markError();
-      }
+    // Check if image is already loaded (from cache)
+    if (imgRef.current?.complete) {
+      setIsLoaded(true);
     }
-
-    const fallbackTimer = window.setTimeout(() => {
-      if (!active) return;
-      setImageError(true);
-      setImageLoaded(true);
-    }, 8000);
-
-    return () => {
-      active = false;
-      window.clearTimeout(fallbackTimer);
-      preloader.onload = null;
-      preloader.onerror = null;
-    };
   }, [imageUrl]);
+
+  const showSkeleton = !isLoaded && !hasError && !!imageUrl;
+  const showFallback = !isLoaded && hasError;
 
   return (
     <article className="group flex h-full flex-col">
@@ -92,48 +56,34 @@ export function ArticleCard({
             href={post.url}
             className="block overflow-hidden relative h-60 w-full bg-zinc-100 dark:bg-neutral-900 md:h-40 lg:h-40"
           >
-            {imageUrl ? (
-              <Image
+            {imageUrl && (
+              <img
+                ref={imgRef}
                 src={imageUrl}
                 alt={post.title}
-                fill
-                unoptimized
-                priority={priority}
-                loading={priority ? undefined : "lazy"}
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                className={`absolute top-0 left-0 h-full w-full object-cover duration-300 ease-in hover:scale-105 ${
-                  imageLoaded && !imageError ? "opacity-100" : "opacity-0"
+                loading={priority ? "eager" : "lazy"}
+                decoding={priority ? "sync" : "async"}
+                className={`absolute top-0 left-0 h-full w-full object-cover duration-300 ease-in-out group-hover:scale-105 transition-opacity duration-500 ${
+                  isLoaded ? "opacity-100" : "opacity-0"
                 }`}
-                onLoad={() => {
-                  setImageError(false);
-                  setImageLoaded(true);
-                }}
+                onLoad={() => setIsLoaded(true)}
                 onError={() => {
-                  setImageError(true);
-                  setImageLoaded(true);
+                  setHasError(true);
+                  setIsLoaded(true); // Hide skeleton on error
                 }}
               />
-            ) : null}
+            )}
 
-            {isVideo ? (
-              <IconYouTube className="absolute bottom-2 left-6 h-7 w-7 md:h-5 md:w-5" />
-            ) : null}
+            {isVideo && (
+              <IconYouTube className="absolute bottom-2 left-6 h-7 w-7 md:h-5 md:w-5 z-10" />
+            )}
 
-            {!imageLoaded || imageError ? (
-              <div
-                className={`absolute top-0 left-0 flex h-full w-full space-x-4 p-2 pt-6 ${
-                  imageLoaded ? "" : "animate-pulse"
-                }`}
-              >
-                {imageError ? (
-                  <div className="mt-1 h-0 w-0 border-l-[20px] border-r-[20px] border-t-[30px] border-l-transparent border-r-transparent border-t-slate-200 dark:border-t-slate-600" />
-                ) : (
-                  <span className="relative flex h-10 w-10">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-100 opacity-75" />
-                    <span className="relative inline-flex h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-600" />
-                  </span>
-                )}
-
+            {showSkeleton && (
+              <div className="pointer-events-none absolute top-0 left-0 flex h-full w-full animate-pulse space-x-4 p-2 pt-6">
+                <span className="relative flex h-10 w-10">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-100 opacity-75" />
+                  <span className="relative inline-flex h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-600" />
+                </span>
                 <div className="flex-1 space-y-6 py-1">
                   <div className="h-8 rounded bg-slate-200 dark:bg-slate-600 md:h-4" />
                   <div className="space-y-3">
@@ -145,7 +95,13 @@ export function ArticleCard({
                   </div>
                 </div>
               </div>
-            ) : null}
+            )}
+
+            {showFallback && (
+              <div className="pointer-events-none absolute top-0 left-0 flex h-full w-full items-start justify-start p-2 pt-6">
+                <div className="h-0 w-0 border-l-[20px] border-r-[20px] border-t-[30px] border-l-transparent border-r-transparent border-t-slate-200 dark:border-t-slate-600" />
+              </div>
+            )}
           </Link>
 
           <div className="mt-5 w-full px-6">

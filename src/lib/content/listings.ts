@@ -1,4 +1,4 @@
-import { API_PAGE_HITS, type PageHitItem } from "@/lib/analytics";
+import { EXTERNAL_API_PAGE_HITS, type PageHitItem } from "@/lib/analytics";
 import { articlePageSize, categoryMap } from "@/lib/site-config";
 import { getAllPosts } from "./posts";
 import type { PostItem } from "./types";
@@ -6,6 +6,16 @@ import type { PostItem } from "./types";
 const categoryNameMap = new Map<string, string>(
   categoryMap.map((item) => [item.text, item.name]),
 );
+
+// In-memory cache for hits data
+interface HitsCache {
+  data: Map<string, number>;
+  timestamp: number;
+  loading: boolean;
+}
+
+let hitsCache: HitsCache | null = null;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 export interface PostListingResult {
   category?: string;
@@ -27,23 +37,84 @@ function parsePageNumber(pageParam?: string): number {
   return integer > 0 ? integer : 1;
 }
 
+/**
+ * Extract slug from page path/URL
+ * Handles formats:
+ * - "/article-slug" → "article-slug"
+ * - "https://luolei.org/article-slug/" → "article-slug"
+ * - "https://x.luolei.org/article-slug" → "article-slug"
+ */
+function extractSlug(page: string): string {
+  // Remove protocol and domain if present
+  let path = page;
+  
+  // Handle full URLs like "https://luolei.org/article-slug/"
+  if (path.includes("://")) {
+    try {
+      const url = new URL(path);
+      path = url.pathname;
+    } catch {
+      // If URL parsing fails, treat as path
+    }
+  }
+  
+  // Remove leading and trailing slashes
+  return path.replace(/^\//, "").replace(/\/$/, "");
+}
+
 async function getHitsMap(): Promise<{
   hitsMap: Map<string, number>;
   hitsLoading: boolean;
 }> {
-  const hitsMap = new Map<string, number>();
+  // Check if cache is valid
+  if (hitsCache && Date.now() - hitsCache.timestamp < CACHE_TTL_MS) {
+    return { hitsMap: hitsCache.data, hitsLoading: hitsCache.loading };
+  }
 
-  try {
-    const hitsRes = await fetch(API_PAGE_HITS, { cache: "no-store" });
-    const hitsJson = (await hitsRes.json()) as { data?: PageHitItem[] };
-    for (const item of hitsJson.data ?? []) {
-      hitsMap.set(item.page.replace(/^\//, ""), item.hit);
+  // Return stale cache immediately to avoid blocking, then refresh in background
+  const staleCache = hitsCache;
+
+  // Start fresh fetch
+  const fetchPromise = (async () => {
+    const hitsMap = new Map<string, number>();
+    let loading = true;
+
+    try {
+      const hitsRes = await fetch(EXTERNAL_API_PAGE_HITS, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(3000), // 3 second timeout
+      });
+      const hitsJson = (await hitsRes.json()) as { data?: PageHitItem[] };
+      for (const item of hitsJson.data ?? []) {
+        const slug = extractSlug(item.page);
+        // Accumulate hits for the same slug (handles /slug, /slug/, /slug/amp/ etc.)
+        const existingHit = hitsMap.get(slug) ?? 0;
+        hitsMap.set(slug, existingHit + item.hit);
+      }
+      loading = false;
+    } catch {
+      // Keep loading = true on error
     }
 
-    return { hitsMap, hitsLoading: false };
-  } catch {
-    return { hitsMap, hitsLoading: true };
+    // Update cache
+    hitsCache = {
+      data: hitsMap,
+      timestamp: Date.now(),
+      loading,
+    };
+
+    return { hitsMap, hitsLoading: loading };
+  })();
+
+  // If we have stale cache, return it immediately and refresh in background
+  if (staleCache) {
+    // Trigger background refresh
+    fetchPromise.catch(() => {});
+    return { hitsMap: staleCache.data, hitsLoading: staleCache.loading };
   }
+
+  // First request, wait for data
+  return fetchPromise;
 }
 
 export function isKnownCategory(category: string): boolean {
@@ -61,13 +132,19 @@ export async function getPostListing(params: {
   const category = params.category;
   const requestedPage = parsePageNumber(params.pageParam);
   const allPosts = getAllPosts();
-  const { hitsMap, hitsLoading } = await getHitsMap();
-
+  
+  // Start fetching hits in parallel with filtering
+  const hitsPromise = getHitsMap();
+  
   const posts =
     category && category !== "hot"
       ? allPosts.filter((post) => post.categories.includes(category))
       : allPosts;
 
+  // Wait for hits data
+  const { hitsMap, hitsLoading } = await hitsPromise;
+
+  // Sort posts by hits for hot category
   const sortedPosts =
     category === "hot"
       ? [...posts].sort(

@@ -1,6 +1,4 @@
 import { cache } from "react";
-import fs from "node:fs";
-import path from "node:path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
 import { unified } from "unified";
@@ -24,31 +22,12 @@ import {
   getOriginalImage,
 } from "./utils";
 
-const POSTS_DIR = path.join(process.cwd(), "content/posts");
-
-function ensurePostsDir() {
-  if (!fs.existsSync(POSTS_DIR)) {
-    fs.mkdirSync(POSTS_DIR, { recursive: true });
-  }
-}
-
-function listMarkdownFiles(dir: string): string[] {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  const files: string[] = [];
-
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...listMarkdownFiles(fullPath));
-      continue;
-    }
-    if (entry.name.endsWith(".md")) {
-      files.push(fullPath);
-    }
-  }
-
-  return files;
-}
+// Use Vite's import.meta.glob to load markdown files at build time
+const markdownFiles = import.meta.glob("/content/posts/**/*.md", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
 
 function extractExcerpt(content: string): string {
   const lines = content
@@ -182,8 +161,7 @@ function extractHeadingsFromHtml(html: string): PostDetail["headings"] {
   return headings;
 }
 
-function parsePostFile(filePath: string): PostItem | null {
-  const raw = fs.readFileSync(filePath, "utf-8");
+function parsePostContent(filePath: string, raw: string): PostItem | null {
   const { data, content } = matter(raw);
   const frontmatter = data as PostFrontmatter;
 
@@ -191,7 +169,8 @@ function parsePostFile(filePath: string): PostItem | null {
     return null;
   }
 
-  const slug = path.basename(filePath, ".md");
+  // Extract slug from file path
+  const slug = filePath.replace("/content/posts/", "").replace(/\.md$/, "").replace(/\//g, "-");
   const stats = readingTime(content);
 
   return {
@@ -209,12 +188,16 @@ function parsePostFile(filePath: string): PostItem | null {
 }
 
 export const getAllPosts = cache((): PostItem[] => {
-  ensurePostsDir();
-  const files = listMarkdownFiles(POSTS_DIR);
-  return files
-    .map((filePath) => parsePostFile(filePath))
-    .filter((post): post is PostItem => Boolean(post))
-    .sort((a, b) => b.dateTime - a.dateTime);
+  const posts: PostItem[] = [];
+  
+  for (const [filePath, content] of Object.entries(markdownFiles)) {
+    const post = parsePostContent(filePath, content as string);
+    if (post) {
+      posts.push(post);
+    }
+  }
+  
+  return posts.sort((a, b) => b.dateTime - a.dateTime);
 });
 
 export const getCategoryMeta = cache(() => {
@@ -228,42 +211,68 @@ export const getCategoryMeta = cache(() => {
 });
 
 export const getSearchDocuments = cache((): SearchDocument[] => {
-  ensurePostsDir();
-  const files = listMarkdownFiles(POSTS_DIR);
+  const docs: SearchDocument[] = [];
+  
+  for (const [filePath, content] of Object.entries(markdownFiles)) {
+    const raw = content as string;
+    const { data, content: markdownContent } = matter(raw);
+    const frontmatter = data as PostFrontmatter;
 
-  return files
-    .map((filePath): SearchDocument | null => {
-      const raw = fs.readFileSync(filePath, "utf-8");
-      const { data, content } = matter(raw);
-      const frontmatter = data as PostFrontmatter;
+    if (!frontmatter.title || !frontmatter.date || frontmatter.hide) {
+      continue;
+    }
 
-      if (!frontmatter.title || !frontmatter.date || frontmatter.hide) {
-        return null;
-      }
-
-      const slug = path.basename(filePath, ".md");
-      const searchableContent = stripMarkdown(content).slice(0, 4000);
-      return {
-        id: slug,
-        title: frontmatter.title,
-        url: `/${slug}`,
-        cover: frontmatter.cover
-          ? getPreviewImage(frontmatter.cover)
-          : undefined,
-        excerpt: frontmatter.description ?? extractExcerpt(content),
-        content: searchableContent,
-        categories: frontmatter.categories ?? [],
-        dateTime: new Date(frontmatter.date).getTime(),
-      };
-    })
-    .filter((item): item is SearchDocument => Boolean(item));
+    const slug = filePath.replace("/content/posts/", "").replace(/\.md$/, "").replace(/\//g, "-");
+    const searchableContent = stripMarkdown(markdownContent).slice(0, 4000);
+    docs.push({
+      id: slug,
+      title: frontmatter.title,
+      url: `/${slug}`,
+      cover: frontmatter.cover
+        ? getPreviewImage(frontmatter.cover)
+        : undefined,
+      excerpt: frontmatter.description ?? extractExcerpt(markdownContent),
+      content: searchableContent,
+      categories: frontmatter.categories ?? [],
+      dateTime: new Date(frontmatter.date).getTime(),
+    });
+  }
+  
+  return docs;
 });
 
 export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
-  const filePath = path.join(POSTS_DIR, `${slug}.md`);
-  if (!fs.existsSync(filePath)) return null;
+  // Try to find the file by constructing possible paths
+  const possiblePaths = [
+    `/content/posts/${slug}.md`,
+    `/content/posts/${slug.replace(/-/g, "/")}.md`,
+  ];
+  
+  let raw: string | undefined;
+  let matchedPath: string | undefined;
+  
+  for (const path of possiblePaths) {
+    if (markdownFiles[path]) {
+      raw = markdownFiles[path] as string;
+      matchedPath = path;
+      break;
+    }
+  }
+  
+  // If not found directly, search through all files
+  if (!raw) {
+    for (const [filePath, content] of Object.entries(markdownFiles)) {
+      const fileSlug = filePath.replace("/content/posts/", "").replace(/\.md$/, "").replace(/\//g, "-");
+      if (fileSlug === slug) {
+        raw = content as string;
+        matchedPath = filePath;
+        break;
+      }
+    }
+  }
+  
+  if (!raw) return null;
 
-  const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
   const frontmatter = data as PostFrontmatter;
   if (!frontmatter.title || !frontmatter.date || frontmatter.hide) return null;

@@ -7,10 +7,18 @@
   ],
   "main": "./worker/index.ts",
   "assets": {
+    "directory": "./dist/client",
     "not_found_handling": "none",
     "binding": "ASSETS"
   },
   "images": {
     "binding": "IMAGES"
-  }
+  },
+
+  "kv_namespaces": [
+    {
+      "binding": "CACHE_KV",
+      "id": "3edeb5d05aac41578f471952842b422e"
+    }
+  ]
 }

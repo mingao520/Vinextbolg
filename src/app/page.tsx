@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleList } from "@/components/article-list";
 import { CategoryNav } from "@/components/category-nav";
 import { PaginationNav } from "@/components/pagination-nav";
@@ -51,8 +51,9 @@ export async function generateMetadata({
     };
   }
 
+  // SEO 友好格式：/page/2
   const canonical =
-    page > 1 ? `${siteConfig.siteUrl}/?page=${page}` : siteConfig.siteUrl;
+    page > 1 ? `${siteConfig.siteUrl}/page/${page}` : siteConfig.siteUrl;
 
   return {
     alternates: {
@@ -67,16 +68,23 @@ export default async function Home({ searchParams }: HomePageProps) {
   const rawCategory = params.category?.trim().toLowerCase();
   const page = parsePositivePage(params.page);
 
+  // 如果有分类参数，重定向到分类页面
   if (rawCategory) {
     if (!isKnownCategory(rawCategory)) {
       notFound();
     }
 
-    redirect(buildCategoryUrl(rawCategory, page));
+    permanentRedirect(buildCategoryUrl(rawCategory, page));
   }
 
+  // 如果有 page 参数且 page > 1，重定向到 SEO 友好路径 /page/N
+  if (params.page && page > 1) {
+    permanentRedirect(`/page/${page}`);
+  }
+
+  // page <= 1 时，如果 URL 中有 ?page=1，也重定向到首页
   if (params.page && page <= 1) {
-    redirect("/");
+    permanentRedirect("/");
   }
 
   const listing = await getPostListing({ pageParam: params.page });

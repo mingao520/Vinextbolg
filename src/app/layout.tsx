@@ -43,16 +43,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
-      <body className="antialiased">
+    <html lang="zh-CN" className="scroll-pt-[60px]">
+      <body className="antialiased pt-[52px]">
         <SiteHeader />
         {children}
         <SiteFooter />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.analyticsId}`}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="gtag-init" strategy="afterInteractive">
+        <Script id="gtag-init" strategy="lazyOnload">
           {`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '${siteConfig.analyticsId}');`}
         </Script>
       </body>
