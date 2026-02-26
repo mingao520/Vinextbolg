@@ -9,7 +9,8 @@
       "Bash(wc:*)",
       "Bash(pnpm build:*)",
       "Bash(head:*)",
-      "Bash(kill 84960:*)"
+      "Bash(kill 84960:*)",
+      "Bash(pkill:*)"
     ]
   }
 }

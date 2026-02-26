@@ -96,7 +96,8 @@ async function main() {
   }
 
   const vinextBin = process.platform === "win32" ? "vinext.cmd" : "vinext";
-  const args = ["dev", "--port", String(resolvedPort)];
+  const extraArgs = process.argv.slice(2);
+  const args = ["dev", "--port", String(resolvedPort), "--hostname", "0.0.0.0", ...extraArgs];
   const child = spawn(vinextBin, args, {
     stdio: "inherit",
     env: process.env,

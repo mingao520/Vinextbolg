@@ -99,9 +99,9 @@ export async function getPostListing(params: {
   const category = params.category;
   const requestedPage = parsePositivePage(params.pageParam);
   const allPosts = getAllPosts();
-  
+
   const hitsPromise = getHitsMap();
-  
+
   const posts =
     category && category !== "hot"
       ? allPosts.filter((post) => post.categories.includes(category))
