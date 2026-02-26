@@ -7,6 +7,7 @@ export interface SearchDocument {
   content: string;
   categories: string[];
   dateTime: number;
+  keyPoints?: string[];
 }
 
 export interface SearchIndexedDocument extends SearchDocument {
@@ -26,7 +27,7 @@ export function createSearchIndex(
 ): SearchIndexedDocument[] {
   return documents.map((doc) => {
     const searchText = normalizeText(
-      [doc.title, doc.excerpt, doc.content, ...doc.categories].join(" "),
+      [doc.title, doc.excerpt, doc.content, ...doc.categories, ...(doc.keyPoints ?? [])].join(" "),
     );
     return {
       ...doc,
@@ -61,9 +62,19 @@ export function searchDocuments(
       if (normalizeText(doc.excerpt).includes(normalized)) score += 4;
       if (doc.searchText.includes(normalized)) score += 2;
 
+      // keyPoints 匹配加分：离散语义块精确匹配价值高
+      const keyPointsText = (doc.keyPoints ?? []).map(normalizeText);
+      for (const kp of keyPointsText) {
+        if (kp.includes(normalized)) score += 3;
+      }
+
       for (const term of terms) {
         if (normalizeText(doc.title).includes(term)) score += 2;
         if (doc.searchText.includes(term)) score += 1;
+        // keyPoints 单词级匹配
+        for (const kp of keyPointsText) {
+          if (kp.includes(term)) score += 1.5;
+        }
       }
 
       return { ...doc, score };

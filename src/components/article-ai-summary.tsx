@@ -7,15 +7,12 @@ interface ArticleAISummaryProps {
   summary: {
     summary: string;
     abstract: string;
-    keyPoints?: string[];
     tags: string[];
   };
 }
 
 export function ArticleAISummary({ summary }: ArticleAISummaryProps) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const hasKeyPoints = summary.keyPoints && summary.keyPoints.length > 0;
 
   return (
     <div className="my-4">
@@ -37,22 +34,8 @@ export function ArticleAISummary({ summary }: ArticleAISummaryProps) {
             {summary.abstract}
           </p>
 
-          {hasKeyPoints && (
-            <ul className="mt-4 space-y-1.5 border-t border-zinc-100 pt-4 dark:border-zinc-700/60">
-              {summary.keyPoints!.map((point) => (
-                <li
-                  key={point}
-                  className="flex items-start gap-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"
-                >
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400/80" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-          )}
-
           {summary.tags.length > 0 && (
-            <div className={`flex flex-wrap gap-2 ${hasKeyPoints ? "mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-700/60" : "mt-4 border-t border-zinc-100 pt-4 dark:border-zinc-700/60"}`}>
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-700/60">
               {summary.tags.map((tag) => (
                 <span
                   key={tag}

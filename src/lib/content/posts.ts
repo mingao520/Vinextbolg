@@ -14,6 +14,7 @@ import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
 import type { SearchDocument } from "@luoleiorg/search-core";
 import type { PostDetail, PostFrontmatter, PostItem } from "./types";
+import { getAISummary } from "./ai-data";
 import {
   formatDate,
   formatShowDate,
@@ -215,6 +216,7 @@ export const getSearchDocuments = cache((): SearchDocument[] => {
 
     const slug = filePath.replace("/content/posts/", "").replace(/\.md$/, "").replace(/\//g, "-");
     const searchableContent = stripMarkdown(markdownContent).slice(0, 4000);
+    const aiSummary = getAISummary(slug);
     docs.push({
       id: slug,
       title: frontmatter.title,
@@ -226,6 +228,7 @@ export const getSearchDocuments = cache((): SearchDocument[] => {
       content: searchableContent,
       categories: frontmatter.categories ?? [],
       dateTime: new Date(frontmatter.date).getTime(),
+      keyPoints: aiSummary?.keyPoints,
     });
   }
   

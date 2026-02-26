@@ -22,6 +22,7 @@ interface SearchItem {
   excerpt: string;
   content: string;
   score: number;
+  keyPoints?: string[];
 }
 
 interface SearchResponse {
@@ -295,9 +296,15 @@ export function SearchCommand() {
                         <span className="truncate text-sm text-zinc-800 dark:text-zinc-100">
                           {item.title}
                         </span>
-                        <span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                          {item.excerpt || item.content.slice(0, 80)}
-                        </span>
+                        {item.keyPoints && item.keyPoints.length > 0 ? (
+                          <span className="line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400">
+                            {item.keyPoints.slice(0, 2).join(" · ")}
+                          </span>
+                        ) : (
+                          <span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                            {item.excerpt || item.content.slice(0, 80)}
+                          </span>
+                        )}
                       </div>
                     </CommandItem>
                   ))}

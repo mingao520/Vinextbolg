@@ -45,6 +45,7 @@ function toPayload(item: SearchDocument) {
     content: item.content.slice(0, 320),
     categories: item.categories,
     dateTime: item.dateTime,
+    keyPoints: item.keyPoints ?? [],
   };
 }
 
