@@ -2,9 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "luoleiorg-x",
   "compatibility_date": "2026-02-25",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "main": "./worker/index.ts",
   "assets": {
     "directory": "./dist/client",
@@ -14,7 +12,9 @@
   "images": {
     "binding": "IMAGES"
   },
-
+  "vars": {
+    "GA4_PROPERTY_ID": "387620301"
+  },
   "kv_namespaces": [
     {
       "binding": "CACHE_KV",
