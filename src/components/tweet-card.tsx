@@ -1,4 +1,5 @@
 import tweetsCache from "@/../data/tweets-cache.json";
+import { siteConfig } from "@/lib/site-config";
 
 interface TweetData {
   id: string;
@@ -58,10 +59,16 @@ export function TweetCard({ tweetId }: TweetCardProps) {
 
   if (!tweet) {
     return (
-      <div className="my-8 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          推文数据未找到 (ID: {tweetId})
-        </p>
+      <div className="my-8 px-2">
+        <a
+          href={`https://x.com/${siteConfig.author.twitterUsername}/status/${tweetId}`}
+          target="_blank"
+          rel="noreferrer"
+          className="m-auto flex max-w-[32rem] items-center gap-3 rounded-xl border border-zinc-200 p-4 text-sm text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-700 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-300"
+        >
+          <span className="text-lg">𝕏</span>
+          <span>该推文不可用，点击在 X 上查看</span>
+        </a>
       </div>
     );
   }

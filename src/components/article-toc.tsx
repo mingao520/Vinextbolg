@@ -95,7 +95,7 @@ export function ArticleToc({ headings }: ArticleTocProps) {
 
   return (
     <div className="hidden lg:block lg:w-[220px] lg:flex-shrink-0">
-      <div className="fixed top-[110px] w-[220px] max-h-[calc(100vh-140px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 dark:hover:scrollbar-thumb-gray-500">
+      <div className="toc-scroll fixed top-[110px] w-[220px] max-h-[calc(100vh-140px)] overflow-y-auto">
         <div className="article-toc">
           <span
             aria-hidden="true"

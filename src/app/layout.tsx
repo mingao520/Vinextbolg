@@ -14,21 +14,38 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
-    "ZUOLUOTV",
-    "科技",
-    "旅行",
-    "生活方式",
-    "程序员",
-    "前端",
     "罗磊",
+    "ZUOLUOTV",
     "独立博客",
+    "全栈开发",
+    "前端",
+    "AI",
+    "出海",
+    "数码科技",
+    "摄影",
+    "旅行",
+    "马拉松",
+    "跑步",
+    "Shopify",
   ],
+  alternates: {
+    canonical: siteConfig.siteUrl,
+    types: {
+      "application/rss+xml": `${siteConfig.siteUrl}/rss.xml`,
+    },
+  },
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
     type: "website",
     url: siteConfig.siteUrl,
     siteName: siteConfig.title,
+    locale: "zh_CN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: `@${siteConfig.author.twitterUsername}`,
+    creator: `@${siteConfig.author.twitterUsername}`,
   },
   icons: {
     icon: [
@@ -72,9 +89,34 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <ThemeColorMeta />
       </head>
-      <body className="antialiased pt-[52px]">
+      <body className="flex min-h-screen flex-col antialiased pt-[60px]">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: siteConfig.title,
+              url: siteConfig.siteUrl,
+              description: siteConfig.description,
+              inLanguage: "zh-CN",
+              author: {
+                "@type": "Person",
+                name: siteConfig.author.name,
+                url: siteConfig.siteUrl,
+                sameAs: [
+                  siteConfig.social.github,
+                  `https://x.com/${siteConfig.author.twitterUsername}`,
+                  siteConfig.social.youtube,
+                  siteConfig.social.bilibili,
+                  `https://unsplash.com/@${siteConfig.author.unsplash}`,
+                ],
+              },
+            }),
+          }}
+        />
         <SiteHeader />
-        {children}
+        <div className="flex-1">{children}</div>
         <SiteFooter />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.analyticsId}`}

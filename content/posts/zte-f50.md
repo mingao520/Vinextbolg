@@ -10,22 +10,7 @@ tags:
 
 前段时间，买了个**目前市面上最小巧的一线品牌 5G CPE 随身 Wi-Fi**:[中兴 F50](https://zuo.lu/zte-f50)。
 
-<GearCard
-  :time="'下午4:09 · 2024年9月8日'"
-  :product="'中兴 F50 5G 随身 WiFi'"
-  :tags="['5G', 'Wi-Fi']"
-  :prize="337"
-  :originalPrice="369"
-  :content="'花费巨资，买了几个小物件，把老婆电脑桌台面上的线，尽量都收纳到了桌下。🤓'"
-  :currency="'CNY'"
-  :avatar="'https://pbs.twimg.com/profile_images/1550157622300786688/672YmCpB_400x400.jpg'"
-  :image="'https://s.alicdn.com/@sc04/kf/H7aa5ce5138f8467a8481dd05ceb7c424I.png'"
-  :productOfficialPage="'https://zuo.lu/zte-f50'"
- :affiliateLink="{
-    pdd: 'https://zuo.lu/zte-f50-pdd',
-    jd: 'https://zuo.lu/zte-f50',
-  }"
-/>
+<TweetCard tweetId="1727019877714866584" />
 
 目前售价 ¥369，我京东券后实际支付 ¥337，用下来感觉还是挺满意的，在这里分享给大家。
 

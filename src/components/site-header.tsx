@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu } from "lucide-react";
@@ -7,23 +10,38 @@ import { SearchCommand } from "./search-command";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-[color:var(--vp-c-bg)]/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-[color:var(--vp-c-bg)]/90">
-      <div className="mx-auto flex h-[52px] w-full max-w-[1280px] items-center justify-between px-4 md:px-8">
+    <header
+      className={`fixed left-0 right-0 top-0 z-50 bg-[color:var(--vp-c-bg)]/95 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 ease-out dark:bg-[color:var(--vp-c-bg)]/90 ${
+        scrolled
+          ? "border-b border-zinc-200/80 dark:border-zinc-800/80"
+          : "border-b border-transparent"
+      }`}
+    >
+      <div className="mx-auto flex h-[60px] w-full max-w-[1280px] items-center justify-between px-4 md:px-8">
         <Link
           href="/"
-          className="home-nav-title flex items-center gap-2 whitespace-nowrap text-[15px] font-medium tracking-wide"
+          className="home-nav-title flex items-center gap-2.5 whitespace-nowrap text-base font-semibold tracking-wide"
         >
           <Image
             src="/legacy/logo.png"
             alt="luolei logo"
-            width={24}
-            height={24}
-            className="h-6 w-6 rounded-sm"
+            width={28}
+            height={28}
+            className="h-7 w-7"
           />
           <span className="hidden sm:inline">罗磊的独立博客</span>
         </Link>
-        <nav className="flex items-center text-[13px] text-zinc-600 dark:text-zinc-300">
+        <nav className="flex items-center text-sm text-zinc-600 dark:text-zinc-300">
           <div className="hidden items-center md:flex">
             <div className="flex items-center gap-2.5">
               <a

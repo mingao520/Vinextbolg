@@ -25,8 +25,8 @@
 .site-footer a,
 .site-footer p {
   text-decoration-line: none;
-  font-size: 14px;
-  letter-spacing: 1px;
+  font-size: inherit;
+  letter-spacing: normal;
 }
 
 .site-footer a:hover {

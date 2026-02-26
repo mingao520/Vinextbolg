@@ -214,6 +214,15 @@
 .article-content h3[id] {
   scroll-margin-top: 110px;
 }
+/* TOC 滚动条 - 始终隐藏 */
+.toc-scroll {
+  scrollbar-width: none;
+}
+
+.toc-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .article-toc {
   position: relative;
   border-left: 1px solid var(--vp-c-mute);

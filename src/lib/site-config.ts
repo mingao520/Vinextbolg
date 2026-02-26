@@ -2,16 +2,18 @@ export const siteConfig = {
   // Site基本信息
   title: "罗磊的独立博客",
   description:
-    "我是罗磊，来自中国深圳，程序员，前端工程师，视频节目 ZUOLUOTV 制作人，旅行摄影玩家和内容创作者。",
+    "罗磊的独立博客。全栈开发者、ZUOLUOTV 创作者、摄影师和马拉松跑者，分享编程开发、AI 与出海、数码科技、摄影旅行和跑步生活。",
   siteUrl: "https://luolei.org",
-  
+
   // 作者信息
   author: {
     name: "罗磊",
     email: "i@luolei.org",
     github: "foru17",
+    twitterUsername: "luoleiorg",
+    unsplash: "luolei",
   },
-  
+
   // 社交链接
   social: {
     github: "https://github.com/foru17",
@@ -54,5 +56,5 @@ export const categoryMap = [
   { text: "run", name: "跑步", isHome: false },
 ] as const;
 
-export const articlePageSize = 12;
+export const articlePageSize = 16;
 export const hotArticleViews = 5000;

@@ -3,10 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { siteConfig } from "@/lib/site-config";
 
+interface ArtalkInstance {
+  setDarkMode: (dark: boolean) => void;
+  destroy: () => void;
+}
+
 declare global {
   interface Window {
     Artalk?: {
-      init: (config: Record<string, unknown>) => void;
+      init: (config: Record<string, unknown>) => ArtalkInstance;
     };
   }
 }
@@ -62,10 +67,12 @@ export function ArticleComment({ slug, title }: ArticleCommentProps) {
 
     const scriptId = "artalk-js";
     const styleId = "artalk-css";
+    let artalk: ArtalkInstance | null = null;
+    let observer: MutationObserver | null = null;
 
     const init = () => {
       if (!window.Artalk || !containerRef.current) return;
-      window.Artalk.init({
+      artalk = window.Artalk.init({
         el: containerRef.current,
         pageKey: `${siteConfig.siteUrl}/${slug}/`,
         pageTitle: title,
@@ -75,6 +82,22 @@ export function ArticleComment({ slug, title }: ArticleCommentProps) {
           mirror: siteConfig.comments.gravatarMirror,
         },
       });
+
+      // Sync dark mode with current theme
+      const html = document.documentElement;
+      artalk.setDarkMode(html.classList.contains("dark"));
+
+      // Watch for theme changes via MutationObserver
+      observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.attributeName === "class" && artalk) {
+            artalk.setDarkMode(
+              (m.target as HTMLElement).classList.contains("dark"),
+            );
+          }
+        }
+      });
+      observer.observe(html, { attributes: true });
     };
 
     if (!document.getElementById(styleId)) {
@@ -88,7 +111,9 @@ export function ArticleComment({ slug, title }: ArticleCommentProps) {
     const existed = document.getElementById(scriptId);
     if (existed) {
       init();
-      return;
+      return () => {
+        observer?.disconnect();
+      };
     }
 
     const script = document.createElement("script");
@@ -98,6 +123,10 @@ export function ArticleComment({ slug, title }: ArticleCommentProps) {
     script.defer = true;
     script.onload = () => init();
     document.body.appendChild(script);
+
+    return () => {
+      observer?.disconnect();
+    };
   }, [shouldLoad, slug, title]);
 
   return (

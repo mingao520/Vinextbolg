@@ -43,19 +43,34 @@ export async function generateMetadata({
     return { title: "文章不存在" };
   }
 
+  const articleUrl = `${siteConfig.siteUrl}/${post.slug}`;
+  const coverUrl = post.cover ? toAbsoluteUrl(post.cover) : undefined;
+
   return {
     title: post.title,
     description: post.excerpt,
     alternates: {
-      canonical: `${siteConfig.siteUrl}/${post.slug}`,
+      canonical: articleUrl,
     },
     openGraph: {
       title: post.title,
       description: post.excerpt,
       type: "article",
       publishedTime: new Date(post.dateTime).toISOString(),
-      url: `${siteConfig.siteUrl}/${post.slug}`,
-      images: post.cover ? [{ url: post.cover }] : undefined,
+      url: articleUrl,
+      siteName: siteConfig.title,
+      locale: "zh_CN",
+      images: coverUrl
+        ? [{ url: coverUrl, alt: post.title }]
+        : undefined,
+    },
+    twitter: {
+      card: coverUrl ? "summary_large_image" : "summary",
+      site: `@${siteConfig.author.twitterUsername}`,
+      creator: `@${siteConfig.author.twitterUsername}`,
+      title: post.title,
+      description: post.excerpt,
+      ...(coverUrl ? { images: [coverUrl] } : {}),
     },
   };
 }
@@ -92,8 +107,14 @@ export default async function PostPage({ params }: PostPageProps) {
     articleSection: primaryCategoryName,
     author: {
       "@type": "Person",
-      name: "罗磊",
+      name: siteConfig.author.name,
       url: siteConfig.siteUrl,
+      sameAs: [
+        siteConfig.social.github,
+        `https://x.com/${siteConfig.author.twitterUsername}`,
+        siteConfig.social.youtube,
+        siteConfig.social.bilibili,
+      ],
     },
     publisher: {
       "@type": "Organization",

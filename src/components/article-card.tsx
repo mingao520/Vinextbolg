@@ -123,7 +123,7 @@ export function ArticleCard({
 
       <div className="overflow-hidden mt-auto h-12 flex-none rounded-b rounded-t-none bg-white px-6 py-3 shadow-lg dark:bg-zinc-800">
         <div className="flex items-center justify-between">
-          <p className="mb-3 flex items-center font-mono text-sm text-slate-500 dark:text-slate-400">
+          <p className="flex items-center font-mono text-sm text-slate-500 dark:text-slate-400">
             <IconCalendar className="mr-1 h-3 w-3" />
             {post.formatShowDate}
           </p>
