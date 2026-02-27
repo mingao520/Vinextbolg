@@ -13,7 +13,7 @@
     "binding": "IMAGES"
   },
   "vars": {
-    "GA4_PROPERTY_ID": "387620301"
+    "UMAMI_WEBSITE_ID": "185ef031-29b2-49e3-bc50-1c9f80b4e831"
   },
   "kv_namespaces": [
     {

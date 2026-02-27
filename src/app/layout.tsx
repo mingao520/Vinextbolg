@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { siteConfig } from "@/lib/site-config";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ThemeColorMeta } from "@/components/theme-color-meta";
+import { UmamiScript } from "@/components/umami-script";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -130,13 +130,7 @@ export default function RootLayout({
         <SiteHeader />
         <div className="flex-1">{children}</div>
         <SiteFooter />
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.analyticsId}`}
-          strategy="lazyOnload"
-        />
-        <Script id="gtag-init" strategy="lazyOnload">
-          {`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', '${siteConfig.analyticsId}');`}
-        </Script>
+        <UmamiScript />
       </body>
     </html>
   );

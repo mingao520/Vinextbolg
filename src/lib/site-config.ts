@@ -22,9 +22,10 @@ export const siteConfig = {
     bilibili: "https://zuoluo.tv/bilibili",
   },
   
-  // 统计和分析
-  analyticsId: "G-TG5VK8GPSG",
-  analyticsApiUrl: "https://st.luolei.org/ga",
+  // 统计和分析 (Umami)
+  umamiWebsiteId: "185ef031-29b2-49e3-bc50-1c9f80b4e831" as const,
+  umamiScriptUrl: "https://u.is26.com/script.js" as const,
+  analyticsApiUrl: "/api/analytics/hits",
   
   // 评论系统 (Artalk)
   comments: {

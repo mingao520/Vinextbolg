@@ -11,8 +11,10 @@ import { SearchCommand } from "./search-command";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
-  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  // 使用 mounted 状态避免 hydration mismatch
+  const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   // 文章页：单段路径且非首页/分页/分类
   const isArticlePage =
@@ -20,11 +22,14 @@ export function SiteHeader() {
     !pathname.startsWith("/page/") &&
     !pathname.startsWith("/category/");
 
-  const showBorder = scrolled || isArticlePage;
+  // 只有在 mounted 后才使用 scrolled 状态，避免 SSR/客户端不一致
+  const showBorder = (mounted && scrolled) || isArticlePage;
 
   useEffect(() => {
+    setMounted(true);
+    
     const onScroll = () => setScrolled(window.scrollY > 10);
-    onScroll();
+    onScroll(); // 初始检查
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);

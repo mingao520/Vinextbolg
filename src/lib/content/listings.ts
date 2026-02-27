@@ -44,19 +44,32 @@ async function getHitsMap(): Promise<{
     let loading = true;
 
     try {
-      const apiUrl = siteConfig.analyticsApiUrl;
-      if (!apiUrl) throw new Error("analyticsApiUrl not configured");
+      const apiPath = siteConfig.analyticsApiUrl;
+      if (!apiPath) throw new Error("analyticsApiUrl not configured");
+
+      // 服务端渲染需要使用完整 URL
+      // 本地开发使用 localhost，生产使用 siteUrl
+      const isServer = typeof window === "undefined";
+      // 在 vinext 中，开发环境可以通过检查 process.env 或其他方式判断
+      const baseUrl = isServer ? "http://localhost:3000" : "";
+      const apiUrl = `${baseUrl}${apiPath}`;
+
+      console.log("[Server] Fetching hits from:", apiUrl);
 
       const res = await fetch(apiUrl, { signal: AbortSignal.timeout(10000) });
+      
+      console.log("[Server] Hits API response:", res.status);
       if (!res.ok) throw new Error(`stat API error: ${res.status}`);
 
-      const json = (await res.json()) as { data: Array<{ page: string; hit: number }> };
+      const json = (await res.json()) as { total?: number; data: Array<{ page: string; hit: number }> };
+      console.log("[Server] Hits data count:", json.data?.length, "Total:", json.total);
       for (const item of json.data) {
         const slug = extractSlug(item.page);
         const existing = hitsMap.get(slug) ?? 0;
         hitsMap.set(slug, existing + item.hit);
       }
       loading = false;
+      console.log("[Server] Hits map size:", hitsMap.size);
     } catch (error) {
       console.error("[Server] Failed to fetch hits:", error);
     }

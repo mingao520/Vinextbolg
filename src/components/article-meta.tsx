@@ -7,11 +7,22 @@ import { IconCalendar, IconEye, IconLoading, IconClock } from "@/components/icon
 
 interface ArticleMetaProps {
   post: PostDetail;
+  /** 服务端预获取的浏览量（可选） */
+  hits?: number;
 }
 
-export function ArticleMeta({ post }: ArticleMetaProps) {
+export function ArticleMeta({ post, hits: serverHits }: ArticleMetaProps) {
   const banner = getBannerImage(post.cover);
-  const { loading, hits } = usePageHits(post.slug);
+  
+  // 只有未提供服务端数据时才使用客户端 hook
+  const { loading: clientLoading, hits: clientHits } = usePageHits(
+    post.slug, 
+    /* enabled */ serverHits === undefined
+  );
+  
+  // 优先使用服务端数据
+  const hits = serverHits ?? clientHits;
+  const loading = serverHits === undefined && clientLoading;
 
   return (
     <section className="overflow-hidden rounded-md">

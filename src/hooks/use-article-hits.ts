@@ -107,8 +107,8 @@ export function useArticleHits() {
   return { loading, map };
 }
 
-export function usePageHits(slug: string) {
-  const [loading, setLoading] = useState(!globalCache.data);
+export function usePageHits(slug: string, enabled: boolean = true) {
+  const [loading, setLoading] = useState(enabled && !globalCache.data);
   const [hits, setHits] = useState(() => {
     // Try to get from cache immediately
     if (globalCache.data) {
@@ -137,6 +137,12 @@ export function usePageHits(slug: string) {
   }, [slug]);
 
   useEffect(() => {
+    // 如果禁用，不发起请求
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+
     mountedRef.current = true;
     
     async function load() {
@@ -167,7 +173,7 @@ export function usePageHits(slug: string) {
     return () => {
       mountedRef.current = false;
     };
-  }, [slug, updateHits]);
+  }, [slug, updateHits, enabled]);
 
   return { loading, hits };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   IconCalendar,
@@ -30,7 +30,6 @@ export function ArticleCard({
   const isHot = hits > hotArticleViews;
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!imageUrl) {
@@ -38,9 +37,24 @@ export function ArticleCard({
       return;
     }
 
-    if (imgRef.current?.complete) {
+    // 使用 Image 对象预加载，确保跨浏览器兼容性
+    const img = new Image();
+    img.onload = () => setIsLoaded(true);
+    img.onerror = () => {
+      setHasError(true);
+      setIsLoaded(true);
+    };
+    img.src = imageUrl;
+
+    // 如果图片已经缓存，onload 可能不会触发，检查 complete
+    if (img.complete) {
       setIsLoaded(true);
     }
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [imageUrl]);
 
   return (
@@ -52,27 +66,12 @@ export function ArticleCard({
             className="block overflow-hidden relative h-60 w-full bg-zinc-100 dark:bg-neutral-900 md:h-40 lg:h-40"
           >
             {imageUrl && (
-              <>
-                <img
-                  ref={imgRef}
-                  src={imageUrl}
-                  alt={post.title}
-                  loading={priority ? "eager" : "lazy"}
-                  decoding={priority ? "sync" : "async"}
-                  className="hidden h-0 w-0"
-                  onLoad={() => setIsLoaded(true)}
-                  onError={() => {
-                    setHasError(true);
-                    setIsLoaded(true);
-                  }}
-                />
-                <span
-                  style={{ backgroundImage: `url(${imageUrl})` }}
-                  className={`absolute top-0 left-0 h-full w-full bg-cover bg-center duration-300 ease-in hover:scale-105 ${
-                    isLoaded ? "opacity-100" : "opacity-0"
-                  }`}
-                />
-              </>
+              <span
+                style={{ backgroundImage: `url(${imageUrl})` }}
+                className={`absolute top-0 left-0 h-full w-full bg-cover bg-center duration-300 ease-in hover:scale-105 ${
+                  isLoaded ? "opacity-100" : "opacity-0"
+                }`}
+              />
             )}
 
             {isVideo && (

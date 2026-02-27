@@ -15,6 +15,7 @@ import { ArticleAISummary } from "@/components/article-ai-summary";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { getAISeo, getAISummary } from "@/lib/content/ai-data";
 import { categoryMap, siteConfig } from "@/lib/site-config";
+import { getPageHits } from "@/lib/analytics";
 
 const categoryNameMap = new Map<string, string>(
   categoryMap.map((item) => [item.text, item.name]),
@@ -94,6 +95,9 @@ export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) notFound();
+
+  // 服务端获取文章浏览量，避免客户端请求全量数据
+  const hits = await getPageHits(slug);
 
   const siblings = getPostSiblings(slug);
   const aiSummary = getAISummary(slug);
@@ -185,7 +189,7 @@ export default async function PostPage({ params }: PostPageProps) {
       />
       <div className="flex flex-col lg:flex-row lg:gap-12">
         <section className="min-w-0 flex-1 lg:max-w-[860px]">
-          <ArticleMeta post={post} />
+          <ArticleMeta post={post} hits={hits} />
           {aiSummary && <ArticleAISummary summary={aiSummary} />}
           <ContentEnhancer />
 

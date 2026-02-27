@@ -40,7 +40,14 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+# 环境变量文件（包含敏感信息）
+.env
+.env.local
+.env.development
+.env.production
+
+# 但保留示例文件
+!.env.example
 
 # vercel
 .vercel
