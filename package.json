@@ -20,6 +20,7 @@
     "search:json": "node scripts/generate-search-index.mjs",
     "search:pagefind": "node scripts/generate-pagefind-index.mjs",
     "fetch:tweets": "node scripts/fetch-tweets.mjs",
+    "fetch:images": "node scripts/fetch-image-dimensions.mjs",
     "ai:process": "node scripts/ai-process.mjs",
     "pre-publish": "node scripts/pre-publish.mjs"
   },

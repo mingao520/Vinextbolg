@@ -21,6 +21,7 @@ import {
   getArticleLazyImage,
   getPreviewImage,
   getOriginalImage,
+  getImageDimensions,
 } from "./utils";
 
 // Use Vite's import.meta.glob to load markdown files at build time
@@ -113,6 +114,13 @@ function imageTransformPlugin() {
       if (element.tagName !== "img") return;
       const src = String(element.properties?.src ?? "");
       if (!src) return;
+
+      // 获取图片尺寸用于防止布局抖动
+      const dimensions = getImageDimensions(src);
+      const aspectRatio = dimensions
+        ? `${dimensions.width} / ${dimensions.height}`
+        : undefined;
+
       element.properties = {
         ...element.properties,
         "data-src": src,
@@ -120,10 +128,25 @@ function imageTransformPlugin() {
         "data-zoom-src": getOriginalImage(src),
         src: getArticleLazyImage(src),
         loading: "lazy",
+        // 添加尺寸属性防止布局抖动 (CLS)
+        ...(dimensions && {
+          width: dimensions.width,
+          height: dimensions.height,
+          "data-aspect-ratio": aspectRatio,
+        }),
       };
+
+      // 添加 aspect-ratio 样式到 style 属性
+      if (aspectRatio) {
+        const existingStyle = String(element.properties.style ?? "");
+        element.properties.style = existingStyle
+          ? `${existingStyle}; aspect-ratio: ${aspectRatio};`.trim()
+          : `aspect-ratio: ${aspectRatio};`;
+      }
     });
   };
 }
+// Rehype 插件：在构建时为外部链接添加 favicon
 
 // Rehype 插件：在构建时为外部链接添加 favicon
 function externalLinkFaviconPlugin() {

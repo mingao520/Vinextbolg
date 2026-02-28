@@ -12,79 +12,72 @@ export function ArticleCopyright({ title, date, slug }: ArticleCopyrightProps) {
   const markdownLink = `https://github.com/${siteConfig.contentRepo.owner}/${siteConfig.contentRepo.repo}/tree/${siteConfig.contentRepo.branch}/${siteConfig.contentRepo.contentPath}/${slug}.md`;
 
   return (
-    <div className="w-auto">
-      <div className="relative rounded-md border border-zinc-300 px-5 py-5 dark:border-zinc-700">
-        <section className="flex flex-col gap-y-2 text-sm">
-          {/* Copyright icon - absolute positioned */}
-          <IconCopyright className="absolute right-3 top-3 h-4 w-4 text-gray-900 dark:text-slate-200 md:right-5 md:h-6 md:w-6" />
-          
+    <aside className="rounded-lg border border-zinc-300 dark:border-zinc-700 px-5 py-4 text-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 space-y-2">
           {/* 作者 */}
-          <div>
-            <span className="mr-1 font-medium">作者:</span>
-            <span>
-              <a
-                href={siteConfig.siteUrl}
-                className="text-blue-600 hover:text-blue-500 dark:text-blue-300"
-                rel="noreferrer"
-                target="_blank"
-              >
-                {siteConfig.author.name}
-              </a>
-            </span>
+          <div className="flex flex-wrap items-baseline gap-x-1">
+            <span className="font-medium text-gray-700 dark:text-gray-300">作者:</span>
+            <a
+              href={siteConfig.siteUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+            >
+              {siteConfig.author.name}
+            </a>
           </div>
 
           {/* 文章标题 */}
-          <div className="inline-flex">
-            <span className="mr-1 font-medium">文章标题:</span>
-            <span>
-              <a
-                href={markdownLink}
-                className="flex flex-row items-center hover:text-blue-500"
-                rel="noreferrer"
-                target="_blank"
-              >
-                {title}
-                <IconMarkdown className="ml-2 h-5 w-5" />
-              </a>
-            </span>
+          <div className="flex flex-wrap items-baseline gap-x-1">
+            <span className="font-medium text-gray-700 dark:text-gray-300">文章标题:</span>
+            <a
+              href={markdownLink}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+            >
+              <span>{title}</span>
+              <IconMarkdown className="h-4 w-4 flex-shrink-0" />
+            </a>
           </div>
 
           {/* 发表时间 */}
-          <div>
-            <span className="mr-1 font-medium">发表时间:</span>
-            <span>{date}</span>
+          <div className="flex flex-wrap items-baseline gap-x-1">
+            <span className="font-medium text-gray-700 dark:text-gray-300">发表时间:</span>
+            <span className="text-gray-600 dark:text-gray-400">{date}</span>
           </div>
 
           {/* 文章链接 */}
-          <div>
-            <span className="mr-1 font-medium">文章链接:</span>
-            <span>
-              <a
-                href={articleLink}
-                className="text-blue-600 hover:text-blue-500 dark:text-blue-300"
-                rel="noreferrer"
-                target="_blank"
-              >
-                {articleLink}
-              </a>
-            </span>
+          <div className="flex flex-wrap items-baseline gap-x-1">
+            <span className="font-medium text-gray-700 dark:text-gray-300">文章链接:</span>
+            <a
+              href={articleLink}
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors truncate"
+            >
+              {articleLink}
+            </a>
           </div>
 
           {/* 版权说明 */}
-          <div className="flex items-center">
-            <span className="mr-1 font-medium">版权说明:</span>
+          <div className="flex flex-wrap items-center gap-x-1">
+            <span className="font-medium text-gray-700 dark:text-gray-300">版权说明:</span>
             <a
               href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans"
-              className="text-blue-600 hover:text-blue-500 dark:text-blue-300"
-              rel="noreferrer"
               target="_blank"
+              rel="noreferrer"
+              className="text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
             >
-              <span>CC BY-NC-ND 4.0 DEED </span>
+              CC BY-NC-ND 4.0 DEED
             </a>
-            <IconCopyright className="ml-2 h-4 w-4 text-gray-900 dark:text-slate-400" />
+            <IconCopyright className="ml-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
           </div>
-        </section>
+        </div>
+
+        <IconCopyright className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5" />
       </div>
-    </div>
+    </aside>
   );
 }

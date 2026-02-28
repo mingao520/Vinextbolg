@@ -78,3 +78,82 @@ export function getBannerImage(url?: string): string {
   if (!url) return "";
   return toCfImage(url, "w=800");
 }
+
+// 图片尺寸缓存 - 在构建时由 scripts/fetch-image-dimensions.mjs 生成
+let imageDimensionsCache: Map<string, { width: number; height: number }> | null = null;
+
+/**
+ * 加载图片尺寸缓存
+ * 只在构建时执行一次，运行时复用
+ */
+function loadImageDimensionsCache(): Map<string, { width: number; height: number }> {
+  if (imageDimensionsCache) return imageDimensionsCache;
+
+  imageDimensionsCache = new Map();
+
+  try {
+    // 在构建时通过 Vite 的 import.meta.glob 加载缓存文件
+    const cacheFiles = import.meta.glob("/data/image-dimensions.json", {
+      eager: true,
+      import: "default",
+    });
+
+    const cachePath = "/data/image-dimensions.json";
+    const cache = cacheFiles[cachePath] as
+      | { images?: Record<string, { width: number; height: number }> }
+      | undefined;
+
+    if (cache?.images) {
+      for (const [url, dimensions] of Object.entries(cache.images)) {
+        // 存储原始 URL 和清理后的 URL
+        imageDimensionsCache!.set(url, dimensions);
+        // 也存储去掉转换参数的 URL
+        const cleanUrl = stripCfTransform(url);
+        if (cleanUrl !== url) {
+          imageDimensionsCache!.set(cleanUrl, dimensions);
+        }
+      }
+    }
+  } catch {
+    // 缓存文件不存在或加载失败，忽略错误
+  }
+
+  return imageDimensionsCache;
+}
+
+/**
+ * 获取图片尺寸
+ * @param url 图片 URL
+ * @returns 图片尺寸或 null
+ */
+export function getImageDimensions(
+  url: string,
+): { width: number; height: number } | null {
+  const cache = loadImageDimensionsCache();
+
+  // 尝试直接匹配
+  const directMatch = cache.get(url);
+  if (directMatch) return directMatch;
+
+  // 尝试清理后的 URL
+  const cleanUrl = stripCfTransform(url);
+  if (cleanUrl !== url) {
+    const cleanMatch = cache.get(cleanUrl);
+    if (cleanMatch) return cleanMatch;
+  }
+
+  // 尝试添加/移除协议
+  const variations = [
+    url.startsWith("https://") ? url.replace("https://", "http://") : null,
+    url.startsWith("http://") ? url.replace("http://", "https://") : null,
+    url.startsWith("https://") ? `//${url.slice(8)}` : null,
+    url.startsWith("//") ? `https:${url}` : null,
+  ].filter(Boolean);
+
+  for (const variant of variations) {
+    const match = cache.get(variant as string);
+    if (match) return match;
+  }
+
+  return null;
+}

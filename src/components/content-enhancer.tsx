@@ -32,8 +32,28 @@ export function ContentEnhancer() {
   useEffect(() => {
     const roots: Root[] = [];
 
-    // 图片放大功能（排除 favicon）
-    const zoom = mediumZoom(".article-body img:not(.favicon)", {
+    // 图片加载处理：标记已加载的图片，防止布局抖动
+    const handleImageLoad = (img: HTMLImageElement) => {
+      img.setAttribute("data-loaded", "true");
+    };
+
+    // 监听所有文章图片的加载事件
+    const articleImages = document.querySelectorAll<HTMLImageElement>(
+      ".article-body img:not(.favicon)"
+    );
+
+    articleImages.forEach((img) => {
+      // 检查图片是否已经完成加载
+      if (img.complete) {
+        handleImageLoad(img);
+      } else {
+        img.addEventListener("load", () => handleImageLoad(img), { once: true });
+        img.addEventListener("error", () => img.setAttribute("data-loaded", "error"), { once: true });
+      }
+    });
+
+    // 图片放大功能（在图片加载完成后启用）
+    const zoom = mediumZoom(".article-body img:not(.favicon)[data-loaded='true']", {
       background: "var(--vp-c-bg)",
       margin: 24,
     });

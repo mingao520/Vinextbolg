@@ -7,23 +7,29 @@ interface ArticleBottomNavProps {
   next: PostItem | null;
 }
 
-function NavCard({ post }: { post: PostItem }) {
+function NavCard({
+  post,
+  direction
+}: {
+  post: PostItem;
+  direction: "prev" | "next";
+}) {
   const bg = getPreviewImage(post.cover);
+  const isPrev = direction === "prev";
 
   return (
     <Link
       href={post.url}
-      className="flex h-40 w-full items-center rounded-md bg-zinc-100 bg-cover bg-center hover:text-blue-600"
-      style={
-        bg
-          ? {
-              backgroundImage: `url(${bg})`,
-            }
-          : undefined
-      }
+      className="group relative flex-1 h-36 sm:h-40 md:h-44 rounded-lg overflow-hidden bg-zinc-100"
+      style={bg ? { backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
     >
-      <div className="flex h-40 w-full items-center rounded-md bg-black/30 px-2 duration-300 ease-in hover:bg-black/10 md:px-10">
-        <p className="line-clamp-3 break-normal text-sm text-neutral-100 md:line-clamp-2 md:text-lg">
+      {/* 遮罩层 */}
+      <div className="absolute inset-0 bg-black/40 transition-colors group-hover:bg-black/30" />
+      
+      {/* 内容 */}
+      <div className={`relative h-full flex flex-col justify-center px-5 py-4 md:px-6 ${isPrev ? 'items-start' : 'items-end text-right'}`}>
+        <p className="text-xs text-white/70 mb-1.5 tracking-wide">{isPrev ? '← 上一篇' : '下一篇 →'}</p>
+        <p className="text-sm sm:text-base text-white font-medium line-clamp-2 leading-snug">
           {post.title}
         </p>
       </div>
@@ -35,9 +41,9 @@ export function ArticleBottomNav({ prev, next }: ArticleBottomNavProps) {
   if (!prev && !next) return null;
 
   return (
-    <section className="mt-6 flex flex-col justify-center space-y-4 dark:text-slate-200 md:flex-row md:space-x-6 md:space-y-0">
-      {prev ? <NavCard post={prev} /> : null}
-      {next ? <NavCard post={next} /> : null}
-    </section>
+    <nav className="flex flex-col md:flex-row gap-4 mt-6">
+      {prev && <NavCard post={prev} direction="prev" />}
+      {next && <NavCard post={next} direction="next" />}
+    </nav>
   );
 }

@@ -37,7 +37,6 @@ export function ArticleCard({
       return;
     }
 
-    // 使用 Image 对象预加载，确保跨浏览器兼容性
     const img = new Image();
     img.onload = () => setIsLoaded(true);
     img.onerror = () => {
@@ -46,7 +45,6 @@ export function ArticleCard({
     };
     img.src = imageUrl;
 
-    // 如果图片已经缓存，onload 可能不会触发，检查 complete
     if (img.complete) {
       setIsLoaded(true);
     }
@@ -58,49 +56,51 @@ export function ArticleCard({
   }, [imageUrl]);
 
   return (
-    <article className="group flex h-full flex-col">
-      <div className="overflow-hidden flex-1 h-full rounded-t bg-white shadow-lg duration-300 ease-in-out group-hover:shadow-2xl dark:bg-zinc-800">
-        <div className="flex min-h-60 flex-wrap no-underline hover:no-underline md:min-h-40 lg:min-h-40">
-          <Link
-            href={post.url}
-            className="block overflow-hidden relative h-60 w-full bg-zinc-100 dark:bg-neutral-900 md:h-40 lg:h-40"
-          >
-            {imageUrl && (
-              <span
-                style={{ backgroundImage: `url(${imageUrl})` }}
-                className={`absolute top-0 left-0 h-full w-full bg-cover bg-center duration-300 ease-in hover:scale-105 ${
-                  isLoaded ? "opacity-100" : "opacity-0"
-                }`}
-              />
-            )}
+    <article className="group flex h-full flex-col rounded-lg bg-white dark:bg-zinc-800 shadow-lg overflow-hidden">
+      {/* 图片区域 */}
+      <Link
+        href={post.url}
+        className="block relative h-60 w-full md:h-40 lg:h-40 flex-shrink-0 bg-zinc-100 dark:bg-neutral-900 overflow-hidden"
+      >
+        {/* 骨架屏 shimmer 动画 */}
+        {!isLoaded && (
+          <span className="absolute inset-0 bg-gradient-to-r from-zinc-100 via-zinc-200/70 to-zinc-100 dark:from-neutral-900 dark:via-neutral-700/40 dark:to-neutral-900 bg-[length:200%_100%] animate-[shimmer_2.5s_ease-in-out_infinite]" />
+        )}
 
-            {isVideo && (
-              <img
-                src="/icons/youtube.svg"
-                alt="YouTube"
-                className="absolute bottom-2 left-6 h-7 w-7 md:h-5 md:w-5 z-10"
-              />
-            )}
-          </Link>
+        {imageUrl && (
+          <span
+            style={{ backgroundImage: `url(${imageUrl})` }}
+            className={`absolute inset-0 bg-cover bg-center duration-300 ease-in group-hover:scale-105 ${
+              isLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        )}
 
-          <div className="mt-5 w-full px-6">
-            <Link
-              href={post.url}
-              className="line-clamp-2 h-auto break-normal text-base antialiased font-medium text-gray-800 dark:!text-slate-300 sm:text-lg md:h-12 md:text-base"
-            >
-              {post.title}
-            </Link>
-          </div>
-        </div>
-      </div>
+        {isVideo && (
+          <img
+            src="/icons/youtube.svg"
+            alt="YouTube"
+            className="absolute bottom-2 left-6 h-7 w-7 md:h-5 md:w-5 z-10"
+          />
+        )}
+      </Link>
 
-      <div className="overflow-hidden mt-auto h-12 flex-none rounded-b rounded-t-none bg-white px-6 py-3 shadow-lg dark:bg-zinc-800">
-        <div className="flex items-center justify-between">
-          <p className="flex items-center font-mono text-sm text-slate-500 dark:text-slate-400">
+      {/* 内容区域：标题 + 日期，在一个 flex 容器内 */}
+      <div className="flex-1 flex flex-col px-6 py-5">
+        <Link
+          href={post.url}
+          className="line-clamp-2 text-sm leading-snug antialiased font-medium text-gray-800 dark:!text-slate-300 sm:text-base"
+        >
+          {post.title}
+        </Link>
+
+        {/* 日期栏：使用 mt-auto 推到最底部 */}
+        <div className="flex items-center justify-between mt-auto pt-4 text-sm">
+          <p className="flex items-center font-mono text-slate-500 dark:text-slate-400">
             <IconCalendar className="mr-1 h-3 w-3" />
             {post.formatShowDate}
           </p>
-          <div className="flex items-center text-sm text-gray-400 dark:text-slate-400">
+          <div className="flex items-center text-gray-400 dark:text-slate-400">
             {hitsLoading ? (
               <IconLoading className="mr-1 h-3 w-3 animate-spin text-gray-200 dark:text-gray-600" />
             ) : isHot ? (
