@@ -27,7 +27,13 @@
       "WebFetch(domain:docs.umami.is)",
       "Bash(npx tsc:*)",
       "Bash(pnpm tsc:*)",
-      "Bash(pnpm remove:*)"
+      "Bash(pnpm remove:*)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(python3:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm exec:*)",
+      "WebFetch(domain:luolei.org)"
     ]
   }
 }

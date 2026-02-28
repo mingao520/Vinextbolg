@@ -50,6 +50,7 @@ export async function fetchUmamiPageViews(): Promise<UmamiStatsResult> {
     metricsUrl.searchParams.set("startAt", startAt.toString());
     metricsUrl.searchParams.set("endAt", endAt.toString());
     metricsUrl.searchParams.set("type", "path");
+    metricsUrl.searchParams.set("limit", "2000");
 
     console.log("[Umami] Fetching page metrics...");
 
