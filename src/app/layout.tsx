@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ThemeColorMeta } from "@/components/theme-color-meta";
 import { UmamiScript } from "@/components/umami-script";
+import { GoogleAnalyticsScript } from "@/components/google-analytics-script";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
@@ -130,6 +131,7 @@ export default function RootLayout({
         <SiteHeader />
         <div className="flex-1">{children}</div>
         <SiteFooter />
+        <GoogleAnalyticsScript />
         <UmamiScript />
       </body>
     </html>

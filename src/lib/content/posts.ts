@@ -13,6 +13,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
 import type { SearchDocument } from "@luoleiorg/search-core";
+import { siteConfig } from "@/lib/site-config";
 import type { PostDetail, PostFrontmatter, PostItem } from "./types";
 import { getAISummary } from "./ai-data";
 import {
@@ -30,6 +31,18 @@ const markdownFiles = import.meta.glob("/content/posts/**/*.md", {
   import: "default",
   eager: true,
 });
+
+const internalHostnames = (() => {
+  try {
+    const siteUrl = new URL(siteConfig.siteUrl);
+    const host = siteUrl.hostname.toLowerCase();
+    return host.startsWith("www.")
+      ? new Set([host, host.slice(4)])
+      : new Set([host, `www.${host}`]);
+  } catch {
+    return new Set<string>(["luolei.org", "www.luolei.org"]);
+  }
+})();
 
 function extractExcerpt(content: string): string {
   const lines = content
@@ -107,6 +120,36 @@ function getFaviconUrl(domain: string): string {
   return `https://img.is26.com/static.is26.com/favicon/${domain}`;
 }
 
+function getClassNames(input: unknown): string[] {
+  if (Array.isArray(input)) {
+    return input
+      .map((item) => String(item).trim())
+      .filter(Boolean);
+  }
+  if (typeof input === "string") {
+    return input
+      .split(/\s+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function getExternalUrl(href: string): URL | null {
+  try {
+    const url = new URL(href);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
+    }
+    if (internalHostnames.has(url.hostname.toLowerCase())) {
+      return null;
+    }
+    return url;
+  } catch {
+    return null;
+  }
+}
+
 function imageTransformPlugin() {
   return function transformer(tree: Root) {
     visit(tree, "element", (node) => {
@@ -156,11 +199,11 @@ function externalLinkFaviconPlugin() {
       if (element.tagName !== "a") return;
 
       const href = String(element.properties?.href ?? "");
-      // 只处理外部链接
-      if (!href || !href.startsWith("http")) return;
+      if (!href) return;
 
-      const domain = href.split("/")[2];
-      if (!domain) return;
+      const externalUrl = getExternalUrl(href);
+      if (!externalUrl) return;
+      const domain = externalUrl.hostname.toLowerCase();
 
       // 获取链接的子元素
       const children = element.children || [];
@@ -168,14 +211,12 @@ function externalLinkFaviconPlugin() {
       const hasFavicon = children.some((child) => {
         if (child.type !== "element") return false;
         const childEl = child as Element;
+        const classNames = getClassNames(childEl.properties?.className);
         return (
           childEl.tagName === "span" &&
-          String(childEl.properties?.className ?? "").includes(
-            "favicon-wrapper",
-          )
+          classNames.includes("favicon-wrapper")
         );
       });
-      if (hasFavicon) return;
 
       // 创建 favicon 图片元素
       const faviconImg: Element = {
@@ -200,15 +241,25 @@ function externalLinkFaviconPlugin() {
         children: [faviconImg],
       };
 
-      // 给链接添加 has-favicon 类，并在开头插入 favicon
-      const existingClass = String(element.properties?.className ?? "");
+      const rel = new Set(getClassNames(element.properties?.rel));
+      rel.add("noopener");
+      rel.add("noreferrer");
+
+      const classNames = new Set(getClassNames(element.properties?.className));
+      classNames.add("has-favicon");
+
       element.properties = {
         ...element.properties,
-        className: existingClass
-          ? `${existingClass} has-favicon`
-          : "has-favicon",
+        className: Array.from(classNames),
+        target: "_blank",
+        rel: Array.from(rel).join(" "),
+        "data-external-link": "true",
+        "data-external-domain": domain,
       };
-      element.children = [wrapper, ...children];
+
+      if (!hasFavicon) {
+        element.children = [wrapper, ...children];
+      }
     });
   };
 }

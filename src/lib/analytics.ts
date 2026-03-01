@@ -2,7 +2,7 @@
 // 用于文章阅读量统计展示
 
 import { fetchUmamiPageViews } from "./umami";
-import type { UmamiPageView } from "./umami";
+import { extractSlug } from "./utils";
 
 // Local API route (used by client components)
 export const API_PAGE_HITS = "/api/analytics/hits";
@@ -26,6 +26,7 @@ interface HitsCache {
 const CACHE_VERSION = 2;
 let serverHitsCache: (HitsCache & { version?: number }) | null = null;
 const SERVER_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+const ZERO_HITS_REFRESH_AGE_MS = 10 * 60 * 1000; // 10 minutes
 
 export const KV_CACHE_KEY = "umami_pageviews_cache";
 
@@ -41,8 +42,13 @@ export async function getPageHits(slug: string): Promise<number> {
     try {
       const cached = await KV.get<{ total: number; data: PageHitItem[]; timestamp: number }>(KV_CACHE_KEY, "json");
       if (cached && Date.now() - cached.timestamp < SERVER_CACHE_TTL) {
-        console.log("[getPageHits] KV Cache hit for:", slug);
-        return calculateHitsForSlug(cached.data, slug);
+        const hits = calculateHitsForSlug(cached.data, slug);
+        // 新文章在缓存窗口内可能仍是 0，超过阈值时回源刷新一次，避免与卡片统计不一致
+        if (hits > 0 || Date.now() - cached.timestamp < ZERO_HITS_REFRESH_AGE_MS) {
+          console.log("[getPageHits] KV Cache hit for:", slug, "hits:", hits);
+          return hits;
+        }
+        console.log("[getPageHits] KV cache zero-hit stale, refreshing for:", slug);
       }
     } catch (err) {
       console.warn("[getPageHits] KV read failed", err);
@@ -53,8 +59,12 @@ export async function getPageHits(slug: string): Promise<number> {
   if (serverHitsCache && 
       serverHitsCache.version === CACHE_VERSION &&
       Date.now() - serverHitsCache.timestamp < SERVER_CACHE_TTL) {
-    console.log("[getPageHits] Memory Cache hit for:", slug);
-    return calculateHitsForSlug(serverHitsCache.data, slug);
+    const hits = calculateHitsForSlug(serverHitsCache.data, slug);
+    if (hits > 0 || Date.now() - serverHitsCache.timestamp < ZERO_HITS_REFRESH_AGE_MS) {
+      console.log("[getPageHits] Memory Cache hit for:", slug, "hits:", hits);
+      return hits;
+    }
+    console.log("[getPageHits] Memory cache zero-hit stale, refreshing for:", slug);
   }
 
   console.log("[getPageHits] Fetching for:", slug);
@@ -91,7 +101,7 @@ export async function getPageHits(slug: string): Promise<number> {
       try {
         const stale = await KV.get<{ data: PageHitItem[] }>(KV_CACHE_KEY, "json");
         if (stale?.data) return calculateHitsForSlug(stale.data, slug);
-      } catch (e) {}
+      } catch {}
     }
 
     if (serverHitsCache) {
@@ -105,23 +115,12 @@ export async function getPageHits(slug: string): Promise<number> {
  * 计算指定 slug 的总浏览量（处理多路径如 /slug, /slug/, /slug/amp/）
  */
 function calculateHitsForSlug(data: PageHitItem[], slug: string): number {
+  const targetSlug = extractSlug(`/${slug}`);
   let total = 0;
   for (const item of data) {
-    const itemSlug = extractSlugFromPath(item.page);
-    if (itemSlug === slug) {
+    if (extractSlug(item.page) === targetSlug) {
       total += item.hit;
     }
   }
   return total;
-}
-
-/**
- * 从路径提取 slug
- */
-function extractSlugFromPath(page: string): string {
-  // 移除开头的 / 和结尾的 /amp/
-  return page
-    .replace(/^\//, "")
-    .replace(/\/amp\/?$/, "")
-    .replace(/\/$/, "");
 }

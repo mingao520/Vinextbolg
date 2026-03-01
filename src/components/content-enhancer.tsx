@@ -5,6 +5,24 @@ import mediumZoom from "medium-zoom";
 import { createRoot, type Root } from "react-dom/client";
 import { TweetCard } from "./tweet-card";
 
+interface UmamiTrackPayload {
+  article_path: string;
+  article_slug: string;
+  target_url: string;
+  target_domain: string;
+  link_text: string;
+}
+
+interface UmamiApi {
+  track: (eventName: string, eventData?: UmamiTrackPayload) => void;
+}
+
+declare global {
+  interface Window {
+    umami?: UmamiApi;
+  }
+}
+
 // 注意：favicon 现在由服务端在构建时处理，见 src/lib/content/posts.ts
 // 这里只处理 favicon 加载错误的情况
 
@@ -26,6 +44,46 @@ function hydrateTweetCards(roots: Root[]) {
 
     placeholder.setAttribute("data-hydrated", "true");
   });
+}
+
+function getExternalLink(link: HTMLAnchorElement): URL | null {
+  const href = link.getAttribute("href");
+  if (!href) return null;
+
+  try {
+    const url = new URL(href, window.location.origin);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
+    }
+    if (url.origin === window.location.origin) {
+      return null;
+    }
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+function ensureExternalLinkAttrs(link: HTMLAnchorElement, externalUrl: URL) {
+  link.setAttribute("target", "_blank");
+
+  const relSet = new Set(
+    (link.getAttribute("rel") ?? "")
+      .split(/\s+/)
+      .map((item) => item.trim())
+      .filter(Boolean),
+  );
+  relSet.add("noopener");
+  relSet.add("noreferrer");
+  link.setAttribute("rel", Array.from(relSet).join(" "));
+  link.dataset.externalLink = "true";
+  link.dataset.externalDomain = externalUrl.hostname.toLowerCase();
+}
+
+function getArticleInfo() {
+  const articlePath = window.location.pathname || "/";
+  const articleSlug = articlePath.replace(/^\/+|\/+$/g, "") || "index";
+  return { articlePath, articleSlug };
 }
 
 export function ContentEnhancer() {
@@ -82,11 +140,53 @@ export function ContentEnhancer() {
       };
     });
 
+    const allLinks = document.querySelectorAll<HTMLAnchorElement>(
+      ".article-body a[href]"
+    );
+
+    // 兜底确保外链新窗口打开，避免文章内点击直接跳出当前页
+    allLinks.forEach((link) => {
+      const externalUrl = getExternalLink(link);
+      if (!externalUrl) return;
+      ensureExternalLinkAttrs(link, externalUrl);
+    });
+
+    const handleOutboundClick = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      if (!target) return;
+
+      const link = target.closest<HTMLAnchorElement>(".article-body a[href]");
+      if (!link) return;
+
+      const externalUrl = getExternalLink(link);
+      if (!externalUrl) return;
+
+      ensureExternalLinkAttrs(link, externalUrl);
+
+      const { articlePath, articleSlug } = getArticleInfo();
+      const linkText = (link.textContent ?? "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 120);
+
+      window.umami?.track?.("article_outbound_click", {
+        article_path: articlePath,
+        article_slug: articleSlug,
+        target_url: externalUrl.href,
+        target_domain: externalUrl.hostname.toLowerCase(),
+        link_text: linkText || "(empty)",
+      });
+    };
+
+    const articleBody = document.querySelector<HTMLElement>(".article-body");
+    articleBody?.addEventListener("click", handleOutboundClick, true);
+
     // Hydrate TweetCards
     hydrateTweetCards(roots);
 
     return () => {
       zoom.detach();
+      articleBody?.removeEventListener("click", handleOutboundClick, true);
       for (const root of roots) {
         root.unmount();
       }
