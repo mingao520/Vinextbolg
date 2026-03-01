@@ -98,14 +98,12 @@ export function SiteHeader() {
               >
                 RSS
               </a>
-              <a
-                href={siteConfig.social.github}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/about"
                 className="px-1 py-1 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
               >
                 关于
-              </a>
+              </Link>
             </div>
 
             <span className="mx-3 h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
@@ -169,14 +167,12 @@ export function SiteHeader() {
                 >
                   <span>RSS</span>
                 </a>
-                <a
-                  href={siteConfig.social.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/about"
                   className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                 >
                   <span>关于</span>
-                </a>
+                </Link>
                 <a
                   href={siteConfig.social.twitter}
                   target="_blank"

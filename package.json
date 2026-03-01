@@ -20,8 +20,14 @@
     "search:json": "node scripts/generate-search-index.mjs",
     "search:pagefind": "node scripts/generate-pagefind-index.mjs",
     "fetch:tweets": "node scripts/fetch-tweets.mjs",
+    "fetch:tweets:author": "node scripts/fetch-author-tweets.mjs",
     "fetch:images": "node scripts/fetch-image-dimensions.mjs",
     "ai:process": "node scripts/ai-process.mjs",
+    "ai:profile": "node scripts/generate-author-profile.mjs",
+    "profile:context": "node scripts/build-author-context.mjs",
+    "profile:generate": "node scripts/generate-profile-report.mjs",
+    "profile:all": "node scripts/build-author-context.mjs && node scripts/generate-profile-report.mjs --all",
+    "profile:force": "node scripts/build-author-context.mjs && node scripts/generate-profile-report.mjs --all --force",
     "pre-publish": "node scripts/pre-publish.mjs"
   },
   "dependencies": {

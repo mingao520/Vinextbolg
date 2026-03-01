@@ -45,6 +45,7 @@ yarn-error.log*
 .env.local
 .env.development
 .env.production
+.profile-models.json
 
 # 但保留示例文件
 !.env.example

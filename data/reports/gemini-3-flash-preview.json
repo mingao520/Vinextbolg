@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "lastUpdated": "2026-03-01T16:15:09.884Z",
+    "model": "gemini-3-flash-preview",
+    "modelName": "Gemini 3",
+    "provider": "Google",
+    "generatedBy": "ai",
+    "sources": [
+      "posts",
+      "tweets",
+      "github"
+    ]
+  },
+  "report": {
+    "hero": {
+      "title": "AI 视角下的罗磊",
+      "summary": "一位将极致工程效率、全栈技术能力与硬核生活实证深度融合的数字化实践者。",
+      "intro": "罗磊曾任阅文集团高级前端架构师，现为活跃于全球技术前沿的独立全栈开发者。他擅长利用 AI 工具链（Vibe Coding）进行高速开发，并长期通过博客与社交媒体记录其在数字基建、性能优化及硬核生活方式上的深度探索。"
+    },
+    "identities": [
+      {
+        "name": "全栈独立开发者",
+        "description": "具备从前端 UI 设计到后端高性能架构、再到 DevOps 部署的全链路交付能力。",
+        "evidence": "通过 Vibe Coding 模式自主开发了 Neko Master、Clash Master 等多个开源项目，并熟练运用 React、NestJS 与 ClickHouse。",
+        "link": "https://github.com/foru17/neko-master"
+      },
+      {
+        "name": "数字基建与效率专家",
+        "description": "热衷于构建自主可控的个人数字基础设施，对网络协议、云服务优化有极深造诣。",
+        "evidence": "长期分享关于 HomeLab 搭建、个人网络安全脱钩策略及全球 AI 服务访问门槛的解决方案。",
+        "link": "https://luolei.org/personal-decoupling-cybersecurity"
+      },
+      {
+        "name": "硬核生活实证主义者",
+        "description": "将极客精神延伸至物理世界，通过数据和实测管理健康、旅行与家庭生活。",
+        "evidence": "完成 8 场全程马拉松，骑行川藏线 2200 公里，并详尽记录从医学验光到春晚码率测试的各项生活数据。",
+        "link": "https://luolei.org/kyoto-marathon-2025"
+      }
+    ],
+    "strengths": [
+      {
+        "title": "AI 驱动的工程效率",
+        "points": [
+          "熟练运用 Vibe Coding 模式，通过 Claude 与 Kimi 等模型实现从 MVP 到复杂系统的快速迭代。",
+          "具备跨模型协作能力，擅长利用 AI 攻克硬盘 I/O 优化与 ClickHouse 架构升级等技术深水区问题。",
+          "能够将 AI 深度集成至开发流，实现全项目范围的代码重构与性能调优。"
+        ]
+      },
+      {
+        "title": "全栈架构与性能优化",
+        "points": [
+          "深厚的前端功底，曾主导大型网文平台重构，并实现 Hybrid App 性能提升 30% 的实绩。",
+          "精通 Node.js 生态与边缘计算（Cloudflare Workers），擅长处理高并发流量分析与数据持久化。",
+          "对硬件与软件的结合有敏锐洞察，能自主设计并实现家庭万兆网络与智能家居监控方案。"
+        ]
+      }
+    ],
+    "styles": [
+      {
+        "trait": "实证导向",
+        "description": "凡事亲历亲为并进行量化分析，无论是测评 140 路 IPTV 极限带宽还是对比不同价位键盘声音。"
+      },
+      {
+        "trait": "极致透明",
+        "description": "保持长达十年的高质量公开输出，将职业转型、云账单明细乃至家庭抗癌历程以理性、客观的文字记录。"
+      },
+      {
+        "trait": "工具控特质",
+        "description": "对生产力工具有近乎偏执的追求，热衷于折腾 Raycast 插件、NAS 存储方案及各类境外数字通行证。"
+      }
+    ],
+    "proofs": {
+      "posts": [
+        {
+          "title": "Neko Master: 从 0 到 1K+ Star 的 Vibe Coding 实践",
+          "url": "https://luolei.org/neko-master-vibe-coding",
+          "reason": "展示了作者在 2026 年利用 AI 辅助开发的最新工程方法论与性能优化思路。",
+          "date": "2026-03-01"
+        },
+        {
+          "title": "实现 AI 自由：我为未来准备的 4 个数字通行证",
+          "url": "https://luolei.org/ai-2026",
+          "reason": "体现了作者在数字基建与克服技术门槛方面的深度探索。",
+          "date": "2026-02-04"
+        },
+        {
+          "title": "脱钩: 我的个人网络安全策略",
+          "url": "https://luolei.org/personal-decoupling-cybersecurity",
+          "reason": "反映了作者对个人隐私、数据主权及网络环境的深刻思考与实操方案。",
+          "date": "2023-09-16"
+        },
+        {
+          "title": "我的云账单: 2023 年",
+          "url": "https://luolei.org/how-much-i-spend-on-cloud-monthly-2023",
+          "reason": "通过具体数据展示了作者对数字服务订阅的理性管理与降本增效实践。",
+          "date": "2023-01-07"
+        },
+        {
+          "title": "编程五年:我辞职了",
+          "url": "https://luolei.org/new-journey",
+          "reason": "记录了作者从大厂架构师向内容创业者与独立开发者转型的核心心路历程。",
+          "date": "2018-10-10"
+        }
+      ],
+      "tweets": [
+        {
+          "title": "Clash Master 24小时收获 400+ Star",
+          "url": "https://x.com/luoleiorg/status/2019758733983912111",
+          "reason": "证明了其项目在开发者社区的快速影响力与 Vibe Coding 的高效性。",
+          "date": "2026-02-06T00:00:00Z"
+        },
+        {
+          "title": "2026 移动 CPE 组合分享",
+          "url": "https://x.com/luoleiorg/status/2018594994530230757",
+          "reason": "展示了其在移动网络、多地组网等硬核网络基建上的实战配置。",
+          "date": "2026-02-03T00:00:00Z"
+        },
+        {
+          "title": "Kimi K2.5 吹捧与 Vibe Coding 实测",
+          "url": "https://x.com/luoleiorg/status/2019418455276204185",
+          "reason": "体现了作者对国产 AI 模型能力的敏锐捕捉与应用实践。",
+          "date": "2026-02-05T00:00:00Z"
+        }
+      ],
+      "projects": [
+        {
+          "title": "Neko Master",
+          "url": "https://github.com/foru17/neko-master",
+          "reason": "开源网络流量分析面板，集成了 ClickHouse 高性能存储，是其 Vibe Coding 的代表作。"
+        },
+        {
+          "title": "Raycast Sink",
+          "url": "https://github.com/foru17/raycast-sink",
+          "reason": "基于 Cloudflare 的短链管理插件，体现了其对工作流整合的追求。"
+        },
+        {
+          "title": "Clash Master",
+          "url": "https://github.com/foru17/clash-master",
+          "reason": "快速迭代的开源网络工具，展示了其在 Docker 部署与流量可视化方面的能力。"
+        }
+      ]
+    },
+    "disclaimer": "以上内容由 AI 基于作者公开数据生成，旨在提供客观的第三方画像参考。"
+  }
+}

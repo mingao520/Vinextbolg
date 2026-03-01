@@ -1,0 +1,45 @@
+{
+  "defaultModel": "gemini-3-flash-preview",
+  "models": [
+    {
+      "id": "gemini-3-flash-preview",
+      "name": "Gemini 3",
+      "provider": "Google",
+      "icon": "gemini",
+      "generatedAt": "2026-03-01T16:15:09.884Z",
+      "generatedBy": "ai"
+    },
+    {
+      "id": "qwen3.5-plus",
+      "name": "Qwen 3.5 Plus",
+      "provider": "Alibaba",
+      "icon": "qwen",
+      "generatedAt": "2026-03-01T16:17:54.860Z",
+      "generatedBy": "ai"
+    },
+    {
+      "id": "kimi-k2.5",
+      "name": "Kimi K2.5",
+      "provider": "Moonshot",
+      "icon": "kimi",
+      "generatedAt": "2026-03-01T16:23:46.468Z",
+      "generatedBy": "ai"
+    },
+    {
+      "id": "doubao-seed-2-0-pro-260215",
+      "name": "Doubao Seed2.0 ",
+      "provider": "Bytedance",
+      "icon": "doubao",
+      "generatedAt": "2026-03-01T16:21:12.942Z",
+      "generatedBy": "ai"
+    },
+    {
+      "id": "glm-5",
+      "name": "GLM 5.0 ",
+      "provider": "Zhipu",
+      "icon": "zhipu",
+      "generatedAt": "2026-03-01T16:30:07.803Z",
+      "generatedBy": "ai"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "profile-models-config",
+  "$comment": "多模型 AI Profile 配置文件 — 复制此文件为 .profile-models.json 并填入真实 API Key",
+  "models": [
+    {
+      "id": "gemini-3-flash-preview",
+      "name": "Gemini 3",
+      "provider": "Google",
+      "icon": "gemini",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "apiKey": "YOUR_GOOGLE_API_KEY",
+      "enabled": true
+    },
+    {
+      "id": "qwen3.5-plus",
+      "name": "Qwen 3.5 Plus",
+      "provider": "Alibaba",
+      "icon": "qwen",
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "apiKey": "YOUR_QWEN_API_KEY",
+      "enabled": true
+    },
+    {
+      "id": "kimi-k2.5",
+      "name": "Kimi K2.5",
+      "provider": "Moonshot",
+      "icon": "kimi",
+      "baseUrl": "https://api.moonshot.cn/v1",
+      "apiKey": "YOUR_KIMI_API_KEY",
+      "enabled": true
+    }
+  ]
+}
