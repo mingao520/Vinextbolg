@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-03-01T18:12:32.878Z",
+  "generatedAt": "2026-03-02T04:43:15.310Z",
   "profile": {
     "name": "罗磊",
     "nameEn": "Luo Lei",
-    "headline": "Senior Front-End Developer / Full-Stack Developer",
+    "headline": "Senior Full-Stack Developer / Engineering Efficiency Advocate",
     "location": "Shenzhen, China",
-    "bio": "💻 Full-Stack Developer / 📷 Weekend Photographer / 🎬 YouTuber / ✍️ Blogger / 🏃 Marathon Runner",
+    "bio": "💻 Full-Stack Developer / 🤖 AI & Vibe Coding Practitioner / 📷 Photographer / 🎬 YouTuber / 🏃 Marathoner",
     "social": {
       "github": "https://github.com/foru17",
       "x": "https://x.com/luoleiorg",
@@ -21,8 +21,8 @@
   },
   "highlights": [
     "长期在博客（luolei.org）与 YouTube/Bilibili 持续输出技术与生活方式内容",
-    "关注 AI 工具落地、效率工作流与个人数字基础设施建设",
-    "具备前端到后端、产品到运维的全栈实践能力",
+    "关注 AI 工具落地、Vibe Coding 效率工作流与个人数字基础设施建设",
+    "具备前端到后端、产品到运维的全栈实践能力，热衷于造轮子和开源",
     "Unsplash 摄影作品累计 1500万+ 浏览量、8万+ 下载",
     "完成 8 场全程马拉松（PB: 4h28m）",
     "骑行川藏线 2200 公里（29天）",
@@ -36,7 +36,7 @@
       "title": "Full Stack Developer",
       "company": "Independent / Open Source",
       "period": "Apr 2024 - Present",
-      "description": "全栈独立开发者，使用 React、NestJS、PostgreSQL、Prisma、GraphQL 开发应用，专注性能优化与全球用户体验"
+      "description": "全栈独立开发者，使用 React、NestJS、PostgreSQL、Prisma、GraphQL 开发应用。拥抱 AI 优先开发流 (Vibe Coding)，快速构建开源网络工具和生产力面板"
     },
     {
       "title": "Senior Frontend Developer",

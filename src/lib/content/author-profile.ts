@@ -39,6 +39,7 @@ export interface ProfileReport {
     summary: string;
     intro?: string;
   };
+  tags?: string[];
   identities: IdentityCard[];
   strengths: StrengthGroup[];
   styles: StyleItem[];
@@ -151,12 +152,15 @@ function sanitizeReport(raw: unknown): ProfileReport | null {
         .filter((item): item is StyleItem => item !== null)
     : [];
 
+  const tags = ensureStringArray(reportInput.tags);
+
   return {
     hero: {
       title,
       summary,
       intro: ensureString(heroInput.intro) || undefined,
     },
+    ...(tags.length > 0 ? { tags } : {}),
     identities,
     strengths,
     styles,

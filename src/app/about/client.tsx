@@ -8,9 +8,10 @@ import type {
 } from "@/lib/content/author-profile";
 import { AboutClient } from "@/components/about/model-switcher";
 import { AboutHero } from "@/components/about/about-hero";
+import { AboutTags } from "@/components/about/about-tags";
+import { AboutStyles } from "@/components/about/about-styles";
 import { AboutIdentity } from "@/components/about/about-identity";
 import { AboutStrengths } from "@/components/about/about-strengths";
-import { AboutStyles } from "@/components/about/about-styles";
 import { AboutProofs } from "@/components/about/about-proofs";
 import { AboutDisclaimer } from "@/components/about/about-disclaimer";
 
@@ -69,12 +70,15 @@ export function AboutPageClient({ manifest, reports, postCovers }: AboutPageClie
               meta={meta}
             />
 
+            {report.tags && report.tags.length > 0 && (
+              <AboutTags tags={report.tags} />
+            )}
+
+            <AboutStyles styles={report.styles} />
+
             <AboutIdentity identities={report.identities} />
 
-            <section className="grid gap-4 md:grid-cols-2">
-              <AboutStrengths strengths={report.strengths} />
-              <AboutStyles styles={report.styles} />
-            </section>
+            <AboutStrengths strengths={report.strengths} />
 
             <AboutProofs
               posts={report.proofs.posts}
