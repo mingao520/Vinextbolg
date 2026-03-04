@@ -1,0 +1,49 @@
+name: Vinextbolg Smart Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm install -g pnpm
+
+      - run: pnpm install
+
+      - name: Check if build needed
+        id: changes
+        run: |
+          git fetch origin main --depth=1
+          if git diff --name-only HEAD~1 HEAD | grep -E 'src/|content/'; then
+            echo "build=true" >> $GITHUB_ENV
+          else
+            echo "build=false" >> $GITHUB_ENV
+          fi
+
+      - name: Build project
+        if: env.build == 'true'
+        run: pnpm build
+
+      - name: Generate RSS
+        if: env.build == 'true'
+        run: pnpm generate:rss
+
+      - run: npm install -g wrangler
+
+      - name: Deploy to Cloudflare
+        if: env.build == 'true'
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: npx wrangler deploy --verbose
