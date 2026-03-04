@@ -43,6 +43,7 @@ jobs:
       - run: npm install -g wrangler
 
       - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@2.0.0
         if: env.build == 'true'
         env:
           apiToken: ${{ secrets.CF_API_TOKEN }}
