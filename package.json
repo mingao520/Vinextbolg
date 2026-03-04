@@ -28,7 +28,8 @@
     "profile:generate": "node scripts/generate-profile-report.mjs",
     "profile:all": "node scripts/build-author-context.mjs && node scripts/generate-profile-report.mjs --all",
     "profile:force": "node scripts/build-author-context.mjs && node scripts/generate-profile-report.mjs --all --force",
-    "pre-publish": "node scripts/pre-publish.mjs"
+    "pre-publish": "node scripts/pre-publish.mjs",
+    "generate:rss": "node scripts/generate-rss.js"
   },
   "dependencies": {
     "@luoleiorg/search-core": "workspace:*",
@@ -72,9 +73,5 @@
     "vinext": "^0.0.5",
     "vite": "^7.3.1",
     "wrangler": "^4.68.1"
-  }
-  "scripts": {
-    "build": "vite build",               
-    "generate:rss": "node scripts/generate-rss.js"
   }
 }
