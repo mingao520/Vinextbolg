@@ -48,4 +48,4 @@ jobs:
         env:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-     - run: npx wrangler deploy --verbose
+       run: npx wrangler deploy --verbose
