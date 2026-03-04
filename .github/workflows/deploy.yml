@@ -11,41 +11,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ 拉取仓库
       - uses: actions/checkout@v3
 
+      # 2️⃣ 安装 Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
 
+      # 3️⃣ 安装 pnpm
       - run: npm install -g pnpm
 
+      # 4️⃣ 安装项目依赖
       - run: pnpm install
 
+      # 5️⃣ 检查是否需要 build（src 或 content 文件变化才 build）
       - name: Check if build needed
         id: changes
         run: |
-          git fetch origin main --depth=1
-          if git diff --name-only HEAD~1 HEAD | grep -E 'src/|content/'; then
+          git fetch origin main --depth=2
+          if git diff --name-only HEAD~1 HEAD | grep -E '^src/|^content/'; then
             echo "build=true" >> $GITHUB_ENV
           else
             echo "build=false" >> $GITHUB_ENV
-          fi
 
+      # 6️⃣ 构建项目（有变动才执行）
       - name: Build project
         if: env.build == 'true'
-        run: pnpm build
+        run: |
+          pnpm build
+          pnpm generate:rss
 
-      - name: Generate RSS
-        if: env.build == 'true'
-        run: pnpm generate:rss
-
-      - run: npm install -g wrangler
-
+      # 7️⃣ 部署到 Cloudflare Worker（有变动才执行）
       - name: Deploy to Cloudflare
-        uses: cloudflare/wrangler-action@2.0.0
         if: env.build == 'true'
-        env:
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-       run: npx wrangler deploy --verbose
