@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "luoleiorg-x",
+  "name": "Vinextblog",
   "compatibility_date": "2026-02-25",
+   "account_id" = "<YOUR_CLOUDFLARE_ACCOUNT_ID>"
   "compatibility_flags": ["nodejs_compat"],
   "main": "./worker/index.ts",
   "assets": {
